@@ -13,12 +13,16 @@ fi
 # Customize to your needs...
 
 # read my configuration
+# 共通: ~/.zsh（zsh/lib）、役割別: ~/.zsh.*（config.<env>.toml が ~/.zsh.<env> として deploy）
+# 共通を先に読むので、役割別断片で alias 等を上書きできる
 if [[ -d "${HOME}/.zsh/" ]]; then
-  for file_zsh in "${HOME}/.zsh/"**/*.zsh(N); do
-    source "$file_zsh"
+  for dir in "${HOME}/.zsh/" "${HOME}/.zsh."*(N-/); do
+    for file_zsh in "$dir"/**/*.zsh(N); do
+      source "$file_zsh"
+    done
+    for file in "$dir"/**/*.sh(N); do
+      source "$file"
+    done
   done
-  for file in "${HOME}/.zsh/"**/*.sh(N); do
-    source "$file"
-  done 
 fi
 

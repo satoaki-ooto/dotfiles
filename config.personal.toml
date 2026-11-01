@@ -75,3 +75,9 @@ version = "latest"
 [tools."npm:@moonmath-ai/zro"]
 version = "latest"
 minimum_release_age = "0d"
+
+# ---------------------------------------------------------------
+# 役割別 zsh 断片（~/.zsh.personal として deploy。ローダが ~/.zsh.* を拾う）
+# ---------------------------------------------------------------
+[dotfiles]
+"~/.zsh.personal" = { source = "zsh/personal", mode = "symlink" }

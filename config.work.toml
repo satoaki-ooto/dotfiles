@@ -10,3 +10,9 @@
 
 [bootstrap.packages]
 # "brew:awscli" = { os = "macos" }
+
+# ---------------------------------------------------------------
+# 役割別 zsh 断片（~/.zsh.work として deploy。ローダが ~/.zsh.* を拾う）
+# ---------------------------------------------------------------
+[dotfiles]
+"~/.zsh.work" = { source = "zsh/work", mode = "symlink" }

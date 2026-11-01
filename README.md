@@ -99,14 +99,18 @@ mise bootstrap
 | `config.work.toml` | 会社PC向け（`env = ["work"]` で読み込まれる） |
 | `miserc.local.toml` | 端末ごとの役割選択（gitignored、同期されない） |
 | `zsh/zshrc` | `~/.zshrc` の実体（prezto の init 読み込み + ローダ） |
-| `zsh/lib/` | `~/.zsh` の実体。番号順に再帰読み込みされる断片 |
+| `zsh/lib/` | `~/.zsh` の実体。全端末共通の断片 |
+| `zsh/personal/`, `zsh/work/` | 役割別の断片。`~/.zsh.personal` / `~/.zsh.work` として deploy |
 
 ## zsh
 
 - `~/.zshrc` → `zsh/zshrc`、`~/.zsh` → `zsh/lib` への symlink。編集はどちら側からでも同じ
 - [prezto](https://github.com/sorin-ionescu/prezto) は `~/.zprezto` に `[bootstrap.repos]` が clone する（submodules 込み）。更新は `mise bootstrap repos update`
-- `zsh/lib/` 内は `**/*.zsh` → `**/*.sh` の順で再帰 source。端末固有の断片は
-  `*.local.sh` / `*.local.zsh` に書く（gitignored。`zz.local.sh` とすれば最後に読まれる）
+- ローダは `~/.zsh`、続いて `~/.zsh.*`（役割別）を `**/*.zsh` → `**/*.sh` の順で再帰 source。
+  役割側が後なので、共通の alias 等を役割別断片で上書きできる
+- 役割別断片は `zsh/personal/` / `zsh/work/`。config.personal.toml / config.work.toml が
+  `~/.zsh.personal` / `~/.zsh.work` として deploy する
+- リポジトリに載せない端末固有の断片は `*.local.sh` / `*.local.zsh`（gitignored）
 
 ## 日々の運用
 

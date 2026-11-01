@@ -1,0 +1,1 @@
+PURE_PROMPT_SYMBOL=">"

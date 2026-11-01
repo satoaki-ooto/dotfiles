@@ -1,0 +1,24 @@
+#
+# Executes commands at the start of an interactive session.
+#
+# Authors:
+#   Satoaki Ooto <satoaki.ooto@gmail.com>
+#
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Customize to your needs...
+
+# read my configuration
+if [[ -d "${HOME}/.zsh/" ]]; then
+  for file_zsh in "${HOME}/.zsh/"**/*.zsh(N); do
+    source "$file_zsh"
+  done
+  for file in "${HOME}/.zsh/"**/*.sh(N); do
+    source "$file"
+  done 
+fi
+

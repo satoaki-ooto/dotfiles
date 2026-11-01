@@ -1,0 +1,45 @@
+# 実体: このリポジトリ（~/.config/mise はここへの symlink）
+# 適用: mise bootstrap --dry-run → mise bootstrap
+# 新端末: mise bootstrap --adopt satoaki-ooto/dotfiles
+
+[tools]
+node = "24"   # 実際に使うツールに変更すること
+
+# ---------------------------------------------------------------
+# システムパッケージ（パッケージマネージャが無い端末ではスキップ）
+# ---------------------------------------------------------------
+[bootstrap.packages]
+"brew:zsh" = { os = "macos" }
+"apt:zsh" = "latest"
+
+# ---------------------------------------------------------------
+# Git リポジトリ（新端末で bootstrap が clone する）
+# ---------------------------------------------------------------
+[bootstrap.repos]
+# prezto 本体。更新は `mise bootstrap repos update`
+"~/.zprezto" = { url = "https://github.com/sorin-ionescu/prezto.git", submodules = true, depth = 1 }
+
+# ---------------------------------------------------------------
+# dotfiles の deploy
+# 相対 source は config.toml のある場所（= repo ルート）基準
+# ---------------------------------------------------------------
+[dotfiles]
+"~/.zshrc" = { source = "zsh/zshrc", mode = "symlink" }
+"~/.zsh"   = { source = "zsh/lib", mode = "symlink" }
+
+# ---------------------------------------------------------------
+# シェルへの mise 組み込み
+# 対話非ログインシェルでも使うなら zshrc 側に eval "$(mise activate zsh)" 推奨
+# ---------------------------------------------------------------
+[bootstrap.mise_shell_activate]
+zprofile = "shims"
+
+# ログインシェル
+[bootstrap.user]
+login_shell = "zsh"
+
+# ---------------------------------------------------------------
+# ファイルだけでは表現できないセットアップ（冪等に。毎回走る）
+# ---------------------------------------------------------------
+# [tasks.bootstrap]
+# run = "install -d -m 700 ~/.ssh"

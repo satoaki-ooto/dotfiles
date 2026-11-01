@@ -1,2 +1,4 @@
 miserc.local.toml
 *.local.toml
+*.local.sh
+*.local.zsh

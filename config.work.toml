@@ -1,0 +1,12 @@
+# 会社PC向けモジュール
+# 会社PCの ~/.config/mise/miserc.local.toml に env = ["work"] を書くと読み込まれる
+#
+# 注意: このリポジトリは public。社内固有のパッケージ名・URL・社内ツール名を
+# 書いてよいかは別途判断すること（ダメならリポジトリを private にするか、
+# config.work.local.toml に書いて追跡対象外にする）
+
+[tools]
+# kubectl = "latest"
+
+[bootstrap.packages]
+# "brew:awscli" = { os = "macos" }

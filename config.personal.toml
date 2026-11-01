@@ -1,0 +1,9 @@
+# 個人PC向けモジュール
+# 自宅PCの ~/.config/mise/miserc.local.toml に env = ["personal"] を書くと読み込まれる
+
+[tools]
+# gh = "latest"
+
+[bootstrap.packages]
+# "brew:obsidian" = { os = "macos" }
+# "apt:htop" = "latest"

@@ -5,22 +5,68 @@
 
 ## 新しい端末のセットアップ
 
-```sh
-# mise 導入 & GitHub への SSH 認証を通しておく
-curl https://mise.run | sh
-ssh -T git@github.com
+**手順は上から順に**。前の段が終わっていないと次は動かないので、各段の確認を通ってから進む。
 
-# このリポジトリを ~/.config/mise として取り込み、bootstrap を実行
+### 0. 前提（リポジトリに無いものは手動で入れる）
+
+- **git** — adopt がこのリポジトリを clone するのに必要。
+  macOS: `xcode-select --install` / Debian系: `sudo apt install git`
+- **mise** — `curl -fsSL https://mise.run | sh` の後、`export PATH="$HOME/.local/bin:$PATH"`。
+  確認: `mise --version` が新シェルでも通ること
+- **GitHub への SSH 認証** — 鍵を作って GitHub に登録し、確認: `ssh -T git@github.com` で `Hi satoaki-ooto!`
+  （リポジトリは public なので clone / pull 自体には不要。push 用に必須）
+- **コミット署名の設定**（push する側のみ）— `gpg.format = ssh`、`commit.gpgsign = true`、
+  `user.signingkey` は端末の global 設定なので、ここで設定する + GitHub に Signing Key 登録
+- 既に `~/.config/mise` がある（昔 mise を使っていた）場合は退避:
+  `mv ~/.config/mise ~/.config/mise.bak`
+
+### 1. adopt — このリポジトリを `~/.config/mise` に取り込む
+
+```sh
 mise bootstrap --adopt satoaki-ooto/dotfiles
 ```
 
-既存の `~/.zshrc` などが食い違うと adopt は何も適用せずに止まる（上書きしない）。
-確認して取り込む:
+- 既存の `~/.zshrc` などが食い違うと adopt は**何も適用せずに止まる**（上書きしない）。
+  確認して取り込む:
+  ```sh
+  mise dot status
+  mise dot pull --take-remote-all   # 置き換え前の版は保存されるので mise dot undo で戻せる
+  mise bootstrap
+  ```
+- adopt 自体も bootstrap を1回実行するが、**この時点では役割未選択なので共通設定だけ**が入る
+- `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージがここまでに揃う
+
+### 2. 役割を選ぶ — `miserc.local.toml` を作る
 
 ```sh
-mise dot status
-mise dot pull --take-remote-all   # 置き換え前の版は保存されるので mise dot undo で戻せる
-mise bootstrap
+printf 'env = ["personal"]\n' > ~/.config/mise/miserc.local.toml   # 自宅PC
+# printf 'env = ["work"]\n'    > ~/.config/mise/miserc.local.toml   # 会社PC
+
+mise config   # config.personal.toml（または config.work.toml）が読み込まれていることを確認
+```
+
+- このファイルは gitignored なので adopt では来ない。**必ずここで手動作成**
+- 詳細は下の「端末の役割を選ぶ」
+
+### 3. もう一度 bootstrap — 役割分（モジュール）を適用
+
+```sh
+mise bootstrap --dry-run && mise bootstrap
+```
+
+- **adopt だけでは personal / work の分は入らない**。役割選択後に bootstrap を
+  走らせて初めて入る（ここを忘れやすい）
+
+### 4. 秘密情報（sops）を手動で移す
+
+- age 鍵 → `~/.config/sops/age/keys.txt`、secrets → `~/.config/secrets/`
+- どちらもリポジトリ外。無くてもシェルは起動する（ローダは存在チェックしてスキップする設計）
+
+### 5. 動作確認
+
+```sh
+mise doctor
+exec zsh   # 新しいシェルで zshrc が読めるか
 ```
 
 ## 端末の役割を選ぶ（personal / work）

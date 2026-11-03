@@ -8,6 +8,7 @@
 # パッケージは packages/ の定義を include して初めて有効になる
 # （自動では読まれない）。使うものだけ明示する。
 include = [
+  "packages/ags.toml",
   "packages/bun.toml",
   "packages/command-code.toml",
   "packages/microsandbox.toml",

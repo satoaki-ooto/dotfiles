@@ -19,9 +19,10 @@ UV_SYSTEM_CERTS = "true"
 OPENSPEC_TELEMETRY = "0"
 PATH = "${HOME}/go/bin:{{env.PATH}}"
 
-[tools.node]
-version = "lts"
-#minimum_release_age = "0d"
+# node は conf.d/node/mise.personal.toml に分割（試行）
+# [tools.node]
+# version = "lts"
+# #minimum_release_age = "0d"
 
 [tools.pi]
 version = "1.5.0"

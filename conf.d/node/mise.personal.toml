@@ -1,0 +1,7 @@
+# node（自宅PCのみ）
+# config.personal.toml から分割。miserc.local.toml の env = ["personal"] で読み込まれる。
+# conf.d 内では mise.<env>.toml という名前だけが読まれる（config.*.toml は無視される）。
+
+[tools.node]
+version = "lts"
+#minimum_release_age = "0d"

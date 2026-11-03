@@ -24,13 +24,13 @@ version = "lts"
 #minimum_release_age = "0d"
 
 [tools.pi]
-version = "1.4.0"
+version = "1.5.0"
 minimum_release_age = "0d"
 
 # github repositories
 
 [tools."github:can1357/oh-my-pi"]
-version = "18.14.1"
+version = "18.16.0"
 asset_pattern = 'omp-{{ os(macos="darwin") }}-{{ arch() }}'
 bin = "omp"
 

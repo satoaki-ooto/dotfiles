@@ -40,6 +40,9 @@ npm.package_manager = "bun"
 
 [env]
 OPENSPEC_TELEMETRY = "0"
+# pig の設定 root を固定する。pig は PIG_HOME > XDG_CONFIG_HOME > ~/.pig の順で決めるため、
+# XDG_CONFIG_HOME が無い環境（sandbox 等）でも ~/.config/pig を見に行く
+PIG_HOME = "${HOME}/.config/pig"
 
 # ---------------------------------------------------------------
 # 役割別 zsh 断片（~/.zsh.personal として deploy。ローダが ~/.zsh.* を拾う）

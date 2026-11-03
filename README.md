@@ -105,11 +105,14 @@ mise bootstrap
 | `zsh/zshenv` | `~/.zshenv` の実体。非対話シェル用の環境整備 |
 | `zsh/lib/` | `~/.zsh` の実体。全端末共通の断片 |
 | `zsh/personal/`, `zsh/work/` | 役割別の断片。`~/.zsh.personal` / `~/.zsh.work` として deploy |
-| `agents/<agent>/` | コーディングエージェントの設定。`~/.<agent>` 配下へ deploy |
+| `agents/shared/` | 全エージェント共通の指示（`AGENTS.md` / `rules/`） |
+| `agents/<agent>/` | エージェント固有の設定。対応する設定ディレクトリへ deploy |
 
 ## コーディングエージェントの設定
 
 各エージェントの設定は `agents/<agent>/` に置き、`[dotfiles]` で deploy する。
+`AGENTS.md` と `rules/` は「全エージェントで共通」という位置づけなので `agents/shared/` に
+1 箇所だけ置き、pi と pig の両方から参照する。
 エージェント自身が書き換えるファイルは `merge` で「自分のキー」だけ管理し、
 そうでないものは `copy`（実ファイル）にする。symlink だと sandbox 内で
 `~/.config/mise` が見えず設定を読めないため。
@@ -121,8 +124,8 @@ mise bootstrap
 | `settings.json.tera` | `merge = true` + template | 強制するキー（`theme` / `extensions` / `packages`） |
 | `settings.defaults.json` | `merge = "missing"` | 既定値だけ配るキー（`defaultProvider` / `defaultModel` / `defaultThinkingLevel`） |
 | `models.json` | `copy` | 互換エンドポイントとモデル。API キーは `${RUNINFRA_GATEWAY_KEY}` の env 参照 |
-| `AGENTS.md` | `copy` | 全プロジェクト共通の指示 |
-| `rules/` | `copy` | `AGENTS.md` から `@rules/*.md` で読まれる断片 |
+| `AGENTS.md` | `copy` | 全プロジェクト共通の指示（`agents/shared/` から） |
+| `rules/` | `copy` | `AGENTS.md` から `@rules/*.md` で読まれる断片（`agents/shared/rules/` から） |
 
 - `settings.json` は pi 自身も書き換える（`/settings`、`pi install`、アップグレード時の
   `lastChangelogVersion` 更新）。`merge` にすることで pi の持つキーは壊さない
@@ -132,7 +135,7 @@ mise bootstrap
 - `merge = "missing"` のキーは `/model` で選んだ値を pi の所有物として扱う。
   新しい端末では settings.json が無いので既定値が入り、`pi install` 直後から使える
 - `copy` のファイル（`models.json` / `AGENTS.md` / `rules/`）はターゲット側を編集すると
-  次の apply で上書きされる。編集は `agents/pi/` 側で行い `mise dot apply` で反映する。
+  次の apply で上書きされる。編集は `agents/` 側で行い `mise dot apply` で反映する。
   ターゲット側で編集した内容を取り込むときは `mise dot add ~/.pi/agent/AGENTS.md` のようにする
   （ drift は `mise dot diff` で見える）
 - `{{ env.HOME }}` で絶対パスを展開するため、macOS（`/Users/...`）でも同じ source が使える
@@ -143,6 +146,26 @@ mise bootstrap
   実値は sops の `~/.config/secrets/` 経由）。ただし provider 定義が無いと pi は起動しない
   （`defaults` が `defaultProvider` を配るため）。リポジトリに載せたくない場合は
   fnox（`mode = "fnox"` で age 暗号化配布）か sops + bootstrap task への移行を検討する
+
+### pig（`agents/pig/` → `~/.config/pig/agent/`）
+
+pi と同じ方式。`AGENTS.md` / `rules/` は `agents/shared/` を共有する。
+
+| ファイル | 手法 | 内容 |
+|---|---|---|
+| `settings.json` | `merge = true` | 強制するキー（`theme` / `enableAnalytics`） |
+| `settings.defaults.json` | `merge = "missing"` | 既定値だけ配るキー（`defaultProvider` / `defaultModel`） |
+| `models.json` | `copy` | runinfra の定義。pi の `models.json` と中身は別物（pig は `models.json` のみ読む） |
+| `AGENTS.md` / `rules/` | `copy` | `agents/shared/` から。pi と共通 |
+
+- pig の設定 root は `PIG_HOME` → `XDG_CONFIG_HOME` → `~/.pig` の順で決まる。
+  `config.personal.toml` の `[env]` で `PIG_HOME` を固定しているので、
+  `XDG_CONFIG_HOME` が無い環境（sandbox 等）でも `~/.config/pig` を見に行く
+- pig は `models.json` だけを読み、`models.jsonc` は参照しない。
+  手元に `models.jsonc` が残っていても無効（`[dotfiles]` の `absent` で消している）。
+  「pig が provider を見つけられない」原因はほぼこれ
+- pig は `PIG_USE_PI_DIRS=1` で pi の `~/.pi/agent` を共有できるが、
+  sessions / auth / trust も共有されるため使っていない（分離が pig の既定動作）
 
 ## zsh
 

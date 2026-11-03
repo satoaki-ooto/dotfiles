@@ -43,24 +43,35 @@
 "~/.zprofile/prezto" = { block = '[[ -s "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile" ]] && source "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile"' }
 
 # ---------------------------------------------------------------
-# コーディングエージェント（pi）
-# 実体: agents/pi/。pi は ~/.pi/agent（PI_CODING_AGENT_DIR の既定）を読む
+# コーディングエージェント
+# 実体: agents/<agent>/。共通の指示（AGENTS.md / rules/）は agents/shared/ に置き、
+# 各エージェントから参照する（AGENTS.md は「全エージェントで共通」という位置づけ）
 # ---------------------------------------------------------------
-# settings.json は pi 自身も書き換える（/settings、pi install、アップグレード時の
-# lastChangelogVersion 更新）。そのため merge で「自分のキー」だけ管理する:
+
+# pi: ~/.pi/agent。pig: ~/.config/pig/agent（PIG_HOME で固定。docs/config.md 参照）
+# アプリが書き換える settings.json は merge で「自分のキー」だけ管理する:
 #   - core: 強制するキー（リポジトリが唯一の情報源。pi install したものは
 #     ここに書いてから bootstrap すると全機械に反映される）
-#   - defaults: 既定値だけ配るキー（/model で選んだ値は pi の所有物。無いときだけ埋める）
-"~/.pi/agent/settings.json/core"     = { source = "agents/pi/settings.json.tera", merge = true, template = "tera" }
-"~/.pi/agent/settings.json/defaults" = { source = "agents/pi/settings.defaults.json", merge = "missing" }
+#   - defaults: 既定値だけ配るキー（/model で選んだ値はアプリの所有物。無いときだけ埋める）
+"~/.pi/agent/settings.json/core"          = { source = "agents/pi/settings.json.tera", merge = true, template = "tera" }
+"~/.pi/agent/settings.json/defaults"      = { source = "agents/pi/settings.defaults.json", merge = "missing" }
+"~/.config/pig/agent/settings.json/core"     = { source = "agents/pig/settings.json", merge = true }
+"~/.config/pig/agent/settings.json/defaults" = { source = "agents/pig/settings.defaults.json", merge = "missing" }
 
-# pi が書き換えないものは copy（実ファイル）として配る。
+# アプリが書き換えないものは copy（実ファイル）として配る。
 # symlink だと sandbox 内で ~/.config/mise が見えず設定を読めず error になるため。
-# 編集は agents/pi/ 側で行い mise dot apply で反映する（ターゲット側を編集すると次の apply で上書きされる。
+# 編集は agents/ 側で行い mise dot apply で反映する（ターゲット側を編集すると次の apply で上書きされる。
 # 取り込みたいときは mise dot add <ターゲット> で source に反映できる）
-"~/.pi/agent/models.json" = { source = "agents/pi/models.json", mode = "copy" }
-"~/.pi/agent/AGENTS.md"   = { source = "agents/pi/AGENTS.md", mode = "copy" }
-"~/.pi/agent/rules"       = { source = "agents/pi/rules", mode = "copy" }
+"~/.pi/agent/models.json"          = { source = "agents/pi/models.json", mode = "copy" }
+"~/.pi/agent/AGENTS.md"            = { source = "agents/shared/AGENTS.md", mode = "copy" }
+"~/.pi/agent/rules"                = { source = "agents/shared/rules", mode = "copy" }
+"~/.config/pig/agent/models.json"  = { source = "agents/pig/models.json", mode = "copy" }
+"~/.config/pig/agent/AGENTS.md"    = { source = "agents/shared/AGENTS.md", mode = "copy" }
+"~/.config/pig/agent/rules"        = { source = "agents/shared/rules", mode = "copy" }
+
+# pig は models.json だけを読む（models.jsonc は未参照のため無効）。
+# models.jsonc は誤認のもとになるので配備時に消す（内容は agents/pig/models.json に移行済み）
+"~/.config/pig/agent/models.jsonc" = { mode = "absent" }
 
 # ---------------------------------------------------------------
 # シェルへの mise 組み込み

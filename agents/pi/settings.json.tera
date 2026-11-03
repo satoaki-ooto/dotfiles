@@ -1,0 +1,11 @@
+{
+  "theme": "dark",
+  "extensions": [
+    "-extensions/guard.ts"
+  ],
+  "packages": [
+    {
+      "source": "{{ env.HOME }}/.config/nono/packages/nolabs-ai/pi"
+    }
+  ]
+}

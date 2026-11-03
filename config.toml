@@ -43,6 +43,23 @@
 "~/.zprofile/prezto" = { block = '[[ -s "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile" ]] && source "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile"' }
 
 # ---------------------------------------------------------------
+# コーディングエージェント（pi）
+# 実体: agents/pi/。pi は ~/.pi/agent（PI_CODING_AGENT_DIR の既定）を読む
+# ---------------------------------------------------------------
+# settings.json は pi 自身も書き換える（/settings、pi install、アップグレード時の
+# lastChangelogVersion 更新）。そのため merge で「自分のキー」だけ管理する:
+#   - core: 強制するキー（リポジトリが唯一の情報源。pi install したものは
+#     ここに書いてから bootstrap すると全機械に反映される）
+#   - defaults: 既定値だけ配るキー（/model で選んだ値は pi の所有物。無いときだけ埋める）
+"~/.pi/agent/settings.json/core"     = { source = "agents/pi/settings.json.tera", merge = true, template = "tera" }
+"~/.pi/agent/settings.json/defaults" = { source = "agents/pi/settings.defaults.json", merge = "missing" }
+
+# pi が書き換えないものはそのまま symlink。編集はリポジトリ側か実リンク側のどちらでも同じ
+"~/.pi/agent/models.json" = { source = "agents/pi/models.json", mode = "symlink" }
+"~/.pi/agent/AGENTS.md"   = { source = "agents/pi/AGENTS.md", mode = "symlink" }
+"~/.pi/agent/rules"       = { source = "agents/pi/rules", mode = "symlink-each" }
+
+# ---------------------------------------------------------------
 # シェルへの mise 組み込み
 # zprofile 自体は mise が管理する（dotfiles は prezto の source ブロックだけ追加する）。
 # 対話シェルは zshrc 側の eval "$(mise activate zsh)" で有効になる。

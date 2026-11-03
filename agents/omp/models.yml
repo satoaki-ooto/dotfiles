@@ -3,7 +3,3 @@ providers:
     baseUrl: https://api.runinfra.ai/v1/
     api: openai-completions
     apiKey: RUNINFRA_GATEWAY_KEY
-    models:
-      - id: deepseek-v4-1-flash
-      - id: glm-5-3-flash
-      - id: ornith-1-5-35b

@@ -1,0 +1,4 @@
+# command-code（npm:command-code）
+[tools."npm:command-code"]
+version = "latest"
+minimum_release_age = "0d"

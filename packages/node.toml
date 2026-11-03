@@ -1,0 +1,4 @@
+# node
+[tools.node]
+version = "lts"
+#minimum_release_age = "0d"

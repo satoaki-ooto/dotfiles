@@ -4,6 +4,10 @@
 # 注意: このリポジトリは public。社内固有のパッケージ名・URL・社内ツール名を
 # 書いてよいかは別途判断すること（ダメならリポジトリを private にするか、
 # config.work.local.toml に書いて追跡対象外にする）
+#
+# パッケージは packages/ の定義を include して初めて有効になる
+# （自動では読まれない）。使うものだけ明示する:
+# include = ["packages/kubectl.toml"]
 
 [tools]
 # kubectl = "latest"

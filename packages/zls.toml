@@ -1,0 +1,3 @@
+# zls（zig の LSP。zig と揃えて include する）
+[tools]
+zls = "latest"

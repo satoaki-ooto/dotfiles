@@ -1,0 +1,4 @@
+# strix（github:usestrix/strix）
+[tools."github:usestrix/strix"]
+version = "1.7.0"
+asset_pattern = 'strix-{{ version }}-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="aarch64") }}.tar.gz'

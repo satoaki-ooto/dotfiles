@@ -1,0 +1,5 @@
+# agent-sandbox（github:thomaspeklak/agent-sandbox）
+[tools."github:thomaspeklak/agent-sandbox"]
+version = "0.28.0"
+asset_pattern = 'ags-{{ arch(x64="x86_64", arm64="aarch64") }}-{{ os(macos="apple-darwin", linux="unknown-linux-gnu") }}'
+bin = "ags"

@@ -1,0 +1,4 @@
+# nono（github:nolabs-ai/nono）
+[tools."github:nolabs-ai/nono"]
+version = "0.81.0"
+asset_pattern = 'nono-v{{ version }}-{{ arch(x64="x86_64", arm64="aarch64") }}-{{ os(macos="apple-darwin", linux="unknown-linux-gnu") }}.tar.gz'

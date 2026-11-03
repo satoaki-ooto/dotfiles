@@ -1,81 +1,45 @@
-[tools]
-bun = "latest"
-go = "latest"
-pnpm = "latest"
-sops = "latest"
-uv = "latest"
-zig = "latest"
-zls = "latest"
+# personal 端末の設定（miserc.local.toml の env = ["personal"] で読まれる）
+#
+# パッケージは packages/ に 1 パッケージ 1 ファイルで定義してあり、
+# この include リストが「この端末で使うもの」の明示的な一覧になる。
+# 使わないものは行を削除、追加したいものは行を足すだけ。
+# （packages/ 以下は include しない限り読まれない。*.local.toml は gitignored）
+#
+# 注意: include には [dotfiles] を置けないので、deploy するものはこのファイル直書き。
+
+include = [
+  "packages/agent-hop.toml",
+  "packages/ags.toml",
+  "packages/bun.toml",
+  "packages/cf.toml",
+  "packages/command-code.toml",
+  "packages/go.toml",
+  "packages/node.toml",
+  "packages/omp.toml",
+  "packages/pi.toml",
+  "packages/pig.toml",
+  "packages/pnpm.toml",
+  "packages/smolvm.toml",
+  "packages/sops.toml",
+  "packages/strix.toml",
+  "packages/uv.toml",
+  "packages/zig.toml",
+  "packages/zls.toml",
+  "packages/zro.toml",
+]
 
 [settings]
-paranoid = true
+# paranoid の config カテゴリは local include を拒否するため外している。
+# true は全カテゴリ（config / env_files / plugins / provenance）の指定と同じ。
+# provenance（GitHub attestations / SLSA）と plugins / env_files は維持。
+paranoid = ["env_files", "plugins", "provenance"]
 minimum_release_age = "3d"
 disable_tools = ["python", "python3"]
 experimental = false
 npm.package_manager = "bun"
 
 [env]
-UV_SYSTEM_CERTS = "true"
 OPENSPEC_TELEMETRY = "0"
-PATH = "${HOME}/go/bin:{{env.PATH}}"
-
-# node は conf.d/node/mise.personal.toml に分割（試行）
-# [tools.node]
-# version = "lts"
-# #minimum_release_age = "0d"
-
-[tools.pi]
-version = "1.5.0"
-minimum_release_age = "0d"
-
-# github repositories
-
-[tools."github:can1357/oh-my-pi"]
-version = "18.16.0"
-asset_pattern = 'omp-{{ os(macos="darwin") }}-{{ arch() }}'
-bin = "omp"
-
-[tools."github:MichaelKinsy/PiG"]
-version = "0.5.3"
-asset_pattern = 'pig-{{ version }}-{{ os(macos="darwin") }}-{{ arch(x64="amd64") }}.tar.gz'
-
-[tools."github:nolabs-ai/nono"]
-version = "0.81.0"
-asset_pattern = 'nono-v{{ version }}-{{ arch(x64="x86_64", arm64="aarch64") }}-{{ os(macos="apple-darwin", linux="unknown-linux-gnu") }}.tar.gz'
-
-[tools."github:usestrix/strix"]
-version = "1.7.0"
-asset_pattern = 'strix-{{ version }}-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="aarch64") }}.tar.gz'
-
-[tools."github:smol-machines/smolvm"]
-version = "1.32.4"
-asset_pattern = 'smolvm-{{ version }}-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="arm64") }}.tar.gz'
-
-[tools."github:superradcompany/microsandbox"]
-version = "0.7.12"
-asset_pattern = 'microsandbox-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="arm64") }}.tar.gz'
-
-[tools."github:thomaspeklak/agent-sandbox"]
-version = "0.28.0"
-asset_pattern = 'ags-{{ arch(x64="x86_64", arm64="aarch64") }}-{{ os(macos="apple-darwin", linux="unknown-linux-gnu") }}'
-bin = "ags"
-
-# npm packages
-
-[tools."npm:command-code"]
-version = "latest"
-minimum_release_age = "0d"
-
-[tools."npm:cf"]
-version = "latest"
-minimum_release_age = "0d"
-
-[tools."npm:agent-hop"]
-version = "latest"
-
-[tools."npm:@moonmath-ai/zro"]
-version = "latest"
-minimum_release_age = "0d"
 
 # ---------------------------------------------------------------
 # 役割別 zsh 断片（~/.zsh.personal として deploy。ローダが ~/.zsh.* を拾う）

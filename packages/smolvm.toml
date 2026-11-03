@@ -1,0 +1,4 @@
+# smolvm（github:smol-machines/smolvm）
+[tools."github:smol-machines/smolvm"]
+version = "1.32.4"
+asset_pattern = 'smolvm-{{ version }}-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="arm64") }}.tar.gz'

@@ -1,0 +1,4 @@
+# PiG（github:MichaelKinsy/PiG）
+[tools."github:MichaelKinsy/PiG"]
+version = "0.5.3"
+asset_pattern = 'pig-{{ version }}-{{ os(macos="darwin") }}-{{ arch(x64="amd64") }}.tar.gz'

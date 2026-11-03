@@ -1,0 +1,4 @@
+# zro（npm:@moonmath-ai/zro）
+[tools."npm:@moonmath-ai/zro"]
+version = "latest"
+minimum_release_age = "0d"

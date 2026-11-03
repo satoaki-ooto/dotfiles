@@ -1,0 +1,6 @@
+# uv
+[tools]
+uv = "latest"
+
+[env]
+UV_SYSTEM_CERTS = "true"

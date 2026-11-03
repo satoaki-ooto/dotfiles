@@ -1,0 +1,4 @@
+# cf（npm:cf）
+[tools."npm:cf"]
+version = "latest"
+minimum_release_age = "0d"

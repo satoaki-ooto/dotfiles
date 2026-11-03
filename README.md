@@ -155,8 +155,31 @@ shell activation と共存させるため、symlink ではなく source する�
 ## 日々の運用
 
 - 編集はこのリポジトリ内で → `git commit`（SSH 署名は `commit.gpgsign` + `gpg.format=ssh` で自動）→ `git push`
-- もう1台は `git pull`（symlink 先が更新される）。tools / packages の変更が入ったら `mise bootstrap`
+- もう1台への反映は下の「更新を反映する」
 - 設定の履歴・差分: `mise dot history` / `mise dot diff`
+
+### 更新を反映する
+
+既存の端末でリモートの変更を反映する。`--adopt` は既存の `~/.config/mise` checkout を
+再利用し、`--update` が `origin/main` まで fast-forward してから bootstrap を実行する。
+
+```sh
+# dotfiles / zsh の変更だけ反映する
+mise bootstrap --adopt satoaki-ooto/dotfiles --update \
+  --only dotfiles,mise-shell-activate --yes
+
+# tools / packages / prezto も含めて反映する
+mise bootstrap --adopt satoaki-ooto/dotfiles --update --yes
+```
+
+- `mise bootstrap --update` 単体では `~/.config/mise` は更新されない
+  （`[bootstrap.repos]` の prezto とパッケージメタデータだけが更新される）
+- checkout に未コミットの変更があると fast-forward で止まる。commit / stash してから実行する
+- `--dry-run` は checkout を更新せず、**現在の commit** の内容で計画を出す。
+  更新後の内容を確認したい場合は、先に `git -C ~/.config/mise pull --ff-only` してから
+  `mise bootstrap --dry-run` する
+- `git pull && mise bootstrap` でも同じ結果になる（mise の外で checkout を更新する場合）
+- 反映後の確認: `mise bootstrap status` / `mise dot status`
 
 ## 秘密情報
 

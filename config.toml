@@ -57,6 +57,8 @@
 "~/.pi/agent/settings.json/defaults"      = { source = "agents/pi/settings.defaults.json", merge = "missing" }
 "~/.config/pig/agent/settings.json/core"     = { source = "agents/pig/settings.json", merge = true }
 "~/.config/pig/agent/settings.json/defaults" = { source = "agents/pig/settings.defaults.json", merge = "missing" }
+"~/.omp/agent/config.yml/core"            = { source = "agents/omp/config.yml", merge = true }
+"~/.omp/agent/config.yml/defaults"        = { source = "agents/omp/config.defaults.yml", merge = "missing" }
 
 # アプリが書き換えないものは copy（実ファイル）として配る。
 # symlink だと sandbox 内で ~/.config/mise が見えず設定を読めず error になるため。
@@ -68,6 +70,9 @@
 "~/.config/pig/agent/models.json"  = { source = "agents/pig/models.json", mode = "copy" }
 "~/.config/pig/agent/AGENTS.md"    = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.config/pig/agent/rules"        = { source = "agents/shared/rules", mode = "copy" }
+"~/.omp/agent/models.yml"          = { source = "agents/omp/models.yml", mode = "copy" }
+"~/.omp/agent/AGENTS.md"           = { source = "agents/shared/AGENTS.md", mode = "copy" }
+"~/.omp/agent/rules"               = { source = "agents/shared/rules", mode = "copy" }
 
 # pig は models.json だけを読む（models.jsonc は未参照のため無効）。
 # models.jsonc は誤認のもとになるので配備時に消す（内容は agents/pig/models.json に移行済み）

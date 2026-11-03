@@ -1,0 +1,11 @@
+symbolPreset: nerd
+theme:
+  dark: dark-catppuccin
+cycleOrder:
+  - default
+  - smol
+  - slow
+prewalk:
+  enabled: true
+composer:
+  shape: pi

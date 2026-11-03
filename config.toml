@@ -22,14 +22,30 @@
 # ---------------------------------------------------------------
 # dotfiles の deploy
 # 相対 source は config.toml のある場所（= repo ルート）基準
+# 「自分で管理するもの」と「prezto が管理するもの」を分けて宣言する。
+# 基本は symlink なので、実体を更新すれば次のシェルから反映される。
 # ---------------------------------------------------------------
 [dotfiles]
-"~/.zshrc" = { source = "zsh/zshrc", mode = "symlink" }
-"~/.zsh"   = { source = "zsh/lib", mode = "symlink" }
+# --- 自分で管理するもの（このリポジトリの実体） ---
+"~/.zshrc"    = { source = "zsh/zshrc", mode = "symlink" }
+"~/.zsh"      = { source = "zsh/lib", mode = "symlink" }
+"~/.zpreztorc" = { source = "zsh/zpreztorc", mode = "symlink" }
+
+# --- prezto が管理するもの（~/.zprezto/runcoms の実体） ---
+# repos の clone 後に配備される。prezto を update すれば symlink 先も更新される。
+# ~/.zshrc と ~/.zpreztorc は上の自前版を使うため対象外。
+"~/.zshenv"  = { source = "~/.zprezto/runcoms/zshenv", mode = "symlink" }
+"~/.zlogin"  = { source = "~/.zprezto/runcoms/zlogin", mode = "symlink" }
+"~/.zlogout" = { source = "~/.zprezto/runcoms/zlogout", mode = "symlink" }
+
+# ~/.zprofile は mise の shell activation が書くため symlink できない。
+# 代わりに prezto の zprofile を source するブロックを足し、内容だけ取り込む。
+"~/.zprofile/prezto" = { block = '[[ -s "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile" ]] && source "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile"' }
 
 # ---------------------------------------------------------------
 # シェルへの mise 組み込み
-# 対話非ログインシェルでも使うなら zshrc 側に eval "$(mise activate zsh)" 推奨
+# zprofile 自体は mise が管理する（dotfiles は prezto の source ブロックだけ追加する）。
+# 対話シェルは zshrc 側の eval "$(mise activate zsh)" で有効になる。
 # ---------------------------------------------------------------
 [bootstrap.mise_shell_activate]
 zprofile = "shims"

@@ -49,3 +49,9 @@ PIG_HOME = "${HOME}/.config/pig"
 # ---------------------------------------------------------------
 [dotfiles]
 "~/.zsh.personal" = { source = "zsh/personal", mode = "symlink" }
+
+# ags（agent-sandbox）。ags 自身も config.toml を書き換える（ags tools / install --add-agent-mounts /
+# 初回起動時の自動生成）ため merge で「自分のキー」だけ管理する。
+# アセット（Containerfile / image/ / tmux.conf / uv.toml / pi/）は ags install が配るので管理しない
+"~/.config/ags/config.toml/core"     = { source = "agents/ags/config.toml", merge = true }
+"~/.config/ags/config.toml/defaults" = { source = "agents/ags/config.defaults.toml", merge = "missing" }

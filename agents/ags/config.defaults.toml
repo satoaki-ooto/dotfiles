@@ -1,0 +1,4 @@
+# ags tools（TUI）が [sandbox].enabled_agents を書き換えるため defaults 扱い。
+# 無いときだけ埋める（pi の settings.defaults.json と同じ発想）。値の変更は ags tools で行う
+[sandbox]
+enabled_agents = ["pi", "claude"]

@@ -1,0 +1,101 @@
+# ags（agent-sandbox）のユーザー設定。~/.config/ags/config.toml へ merge = true で配る。
+# ags 自身もこのファイルを書き換える（ags tools / install --add-agent-mounts / 初回起動時の
+# 自動生成）ため、ここにあるキーだけがリポジトリの所有物。
+# ags tools が書き換える [sandbox].enabled_agents は config.defaults.toml（merge = "missing"）扱い。
+# アセット（Containerfile / image/ / tmux.conf / uv.toml / pi/）は ags install が配るので管理しない。
+[sandbox]
+image = "localhost/agent-sandbox:latest"
+# pnpm_version = "12.9.1"  # omitted or "latest" tracks the latest stable release
+containerfile = "~/.config/ags/Containerfile"
+cache_dir = "~/.cache/ags"
+gitconfig_path = "~/.config/ags/gitconfig-agent"
+auth_key = "~/.ssh/ags-agent-auth"
+sign_key = "~/.ssh/ags-agent-signing"
+bootstrap_files = ["auth.json", "models.jsonc"]
+container_boot_dirs = [
+  "/home/dev/.ssh",
+]
+passthrough_env = [
+  "ANTHROPIC_API_KEY",
+  "RUNINFRA_GATEWAY_KEY",
+]
+extra_dnf_packages = [
+  "git",
+  "gh",
+  "openssh-clients",
+  "fd-find",
+  "ripgrep",
+  "rsync",
+  "tmux",
+  "kitty-terminfo",
+  "socat",
+  "make",
+  "pkgconf-pkg-config",
+  "sccache",
+]
+
+[[mount]]
+host = "~/.ssh/known_hosts"
+container = "/home/dev/.ssh/known_hosts"
+mode = "ro"
+kind = "file"
+optional = true
+
+[[agent_mount]]
+host = "~/.claude.json"
+container = "/home/dev/.claude.json"
+kind = "file"
+
+[[agent_mount]]
+host = "~/.claude"
+container = "/home/dev/.claude"
+
+[[agent_mount]]
+host = "~/.codex"
+container = "/home/dev/.codex"
+
+[[agent_mount]]
+host = "~/.pi"
+container = "/home/dev/.pi"
+
+[[mount]]
+host = "~/.agents/skills"
+container = "/home/dev/.agents/skills"
+mode = "ro"
+kind = "dir"
+optional = true
+
+[[mount]]
+host = "~/.config/ags/pi/extensions/guard.ts"
+container = "/home/dev/.pi/agent/extensions/guard.ts"
+mode = "ro"
+kind = "file"
+
+[[agent_mount]]
+host = "~/.config/opencode"
+container = "/home/dev/.config/opencode"
+
+[[agent_mount]]
+host = "~/.gemini"
+container = "/home/dev/.gemini"
+
+[host_ui]
+enabled = false
+binary = "glimpse-host-ui"
+renderer = "stub"
+idle_timeout_ms = 0
+log_level = "info"
+
+[clipboard]
+enabled = true
+mode = "readwrite"
+max_bytes = 33554432
+approval_required = true
+approval_seconds = 300
+approve_writes = false
+
+[desktop_passthrough]
+wayland = false
+
+[update]
+minimum_release_age = 0

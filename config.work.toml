@@ -6,8 +6,19 @@
 # config.work.local.toml に書いて追跡対象外にする）
 #
 # パッケージは packages/ の定義を include して初めて有効になる
-# （自動では読まれない）。使うものだけ明示する:
-# include = ["packages/kubectl.toml"]
+# （自動では読まれない）。使うものだけ明示する。
+include = [
+  "packages/bun.toml",
+  "packages/command-code.toml",
+  "packages/microsandbox.toml",
+  "packages/node.toml",
+  "packages/nono.toml",
+  "packages/omp.toml",
+  "packages/pi.toml",
+  "packages/pig.toml",
+  "packages/rust.toml",
+  "packages/uv.toml",
+]
 
 [tools]
 # kubectl = "latest"

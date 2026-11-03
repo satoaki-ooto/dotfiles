@@ -1,4 +1,4 @@
 # microsandbox（github:superradcompany/microsandbox）
 [tools."github:superradcompany/microsandbox"]
 version = "0.7.12"
-asset_pattern = 'microsandbox-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="arm64") }}.tar.gz'
+asset_pattern = 'microsandbox-{{ os(macos="darwin", linux="linux") }}-{{ arch(x64="x86_64", arm64="aarch64") }}.tar.gz'

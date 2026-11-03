@@ -35,8 +35,8 @@ mise bootstrap --adopt satoaki-ooto/dotfiles
   ```
 - adopt 自体も bootstrap を1回実行するが、**この時点では役割未選択なので共通設定だけ**が入る
 - `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージがここまでに揃う
-- prezto の runcoms（`~/.zshenv` / `~/.zlogin` / `~/.zlogout`）も clone 後に自動で symlink され、
-  `~/.zpreztorc` は自前管理版（テーマ pure）が配備される（下の「zsh の管理分担」）
+- prezto の runcoms（`~/.zlogin` / `~/.zlogout`）も clone 後に自動で symlink され、
+  `~/.zpreztorc` / `~/.zshenv` は自前管理版が配備される（下の「zsh の管理分担」）
 
 ### 2. 役割を選ぶ — `miserc.local.toml` を作る
 
@@ -102,6 +102,7 @@ mise bootstrap
 | `miserc.local.toml` | 端末ごとの役割選択（gitignored、同期されない） |
 | `zsh/zshrc` | `~/.zshrc` の実体（prezto の init 読み込み + ローダ） |
 | `zsh/zpreztorc` | `~/.zpreztorc` の実体。prezto の設定（テーマは pure） |
+| `zsh/zshenv` | `~/.zshenv` の実体。非対話シェル用の環境整備 |
 | `zsh/lib/` | `~/.zsh` の実体。全端末共通の断片 |
 | `zsh/personal/`, `zsh/work/` | 役割別の断片。`~/.zsh.personal` / `~/.zsh.work` として deploy |
 
@@ -111,6 +112,7 @@ mise bootstrap
 「prezto が管理するもの」に分けて配備する。`~/.zprofile` だけは mise の
 shell activation と共存させるため、symlink ではなく source するブロックとして取り込む。
 `~/.zpreztorc` は prezto の既定を元にした自前管理版で、テーマは `pure`。
+`~/.zshenv` も prezto の `runcoms/zshenv` を元にした自前管理版で、中身は同じ。
 
 ### 管理分担
 
@@ -119,13 +121,13 @@ shell activation と共存させるため、symlink ではなく source する�
 | `~/.zshrc` | 自分 | `zsh/zshrc`（このリポジトリ） |
 | `~/.zsh`, `~/.zsh.<role>` | 自分 | `zsh/lib`, `zsh/personal`, `zsh/work` |
 | `~/.zpreztorc` | 自分 | `zsh/zpreztorc`（テーマ pure） |
-| `~/.zshenv` | prezto | `~/.zprezto/runcoms/zshenv` |
+| `~/.zshenv` | 自分 | `zsh/zshenv` |
 | `~/.zlogin` | prezto | `~/.zprezto/runcoms/zlogin` |
 | `~/.zlogout` | prezto | `~/.zprezto/runcoms/zlogout` |
 | `~/.zprofile` | mise + prezto | mise の activation ブロック + `runcoms/zprofile` を source するブロック |
 
 - 自分側は `[dotfiles]` がこのリポジトリの実体へ、prezto 側は `~/.zprezto/runcoms` の実体へ symlink する
-- `~/.zshrc` と `~/.zpreztorc` は自前版を使うため、prezto の runcoms からは配備しない
+- `~/.zshrc` / `~/.zpreztorc` / `~/.zshenv` は自前版を使うため、prezto の runcoms からは配備しない
 - `~/.zprofile` は `[bootstrap.mise_shell_activate]` が書くため symlink できない。
   prezto の zprofile は source するブロックとして足し、内容だけ取り込む
 - 状態の確認は `mise dot status`、配備の取り消しは `mise dot unapply`
@@ -133,10 +135,13 @@ shell activation と共存させるため、symlink ではなく source する�
 - `~/.zprezto` が未 clone の状態では `mise bootstrap --dry-run` は source missing で止まる
   （dry-run は repos を clone しない）。先に `mise bootstrap repos apply` を実行するか、
   そのまま `mise bootstrap` を実行すれば clone 後に配備される
+  （source missing になるのは prezto の実体を参照する `~/.zlogin` / `~/.zlogout` だけ。
+  `~/.zshenv` は自前管理なので prezto 未 clone でも配備できる）
 
 ### 編集
 
-- `~/.zshrc` → `zsh/zshrc`、`~/.zsh` → `zsh/lib`、`~/.zpreztorc` → `zsh/zpreztorc` への symlink。編集はどちら側からでも同じ
+- `~/.zshrc` → `zsh/zshrc`、`~/.zsh` → `zsh/lib`、`~/.zpreztorc` → `zsh/zpreztorc`、
+  `~/.zshenv` → `zsh/zshenv` への symlink。編集はどちら側からでも同じ
 - [prezto](https://github.com/sorin-ionescu/prezto) は `~/.zprezto` に `[bootstrap.repos]` が clone する（submodules 込み）。更新は `mise bootstrap repos update`
 - ローダは `~/.zsh`、続いて `~/.zsh.*`（役割別）を `**/*.zsh` → `**/*.sh` の順で再帰 source。
   役割側が後なので、共通の alias 等を役割別断片で上書きできる
@@ -151,6 +156,15 @@ shell activation と共存させるため、symlink ではなく source する�
 - pure のプロンプト記号などは `zsh/lib/98.theme.sh` で調整する（`PURE_PROMPT_SYMBOL`）
 - `~/.zprezto` 側の `runcoms/zpreztorc` は編集しない。編集すると `mise bootstrap repos update` が dirty で止まる
 - prezto の既定に追従したいときは、`~/.zprezto/runcoms/zpreztorc` と差分を確認してこのファイルへ取り込む
+
+### シェル環境（`zsh/zshenv`）
+
+- `~/.zshenv` は `zsh/zshenv` への symlink。prezto の `runcoms/zshenv` を元にした自前管理版
+- 役割は「ログインシェルでも対話シェルでもないとき、`~/.zprofile` を取り込む」こと
+  （`SHLEVL` が 1 かつ login でないとき）。`~/.zprofile` には mise の activation と
+  prezto の zprofile ブロックが入るので、非対話シェルでも環境変数が揃う
+- `~/.zprezto` 側の `runcoms/zshenv` は編集しない。編集すると `mise bootstrap repos update` が dirty で止まる
+- prezto の既定に追従したいときは、`~/.zprezto/runcoms/zshenv` と差分を確認してこのファイルへ取り込む
 
 ## 日々の運用
 

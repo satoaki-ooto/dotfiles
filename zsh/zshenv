@@ -1,0 +1,14 @@
+#
+# Defines environment variables.
+#
+# Authors:
+#   Satoaki Ooto <satoaki.ooto@gmail.com>
+#
+# このファイルは prezto の runcoms/zshenv を元にした自前管理版。
+# ~/.zprezto 側を編集すると repos update が dirty で止まるため、設定はここで行う。
+#
+
+# Ensure that a non-login, non-interactive shell has a defined environment.
+if [[ ( "$SHLVL" -eq 1 && ! -o LOGIN ) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprofile"
+fi

@@ -30,11 +30,11 @@
 "~/.zshrc"    = { source = "zsh/zshrc", mode = "symlink" }
 "~/.zsh"      = { source = "zsh/lib", mode = "symlink" }
 "~/.zpreztorc" = { source = "zsh/zpreztorc", mode = "symlink" }
+"~/.zshenv"   = { source = "zsh/zshenv", mode = "symlink" }
 
 # --- prezto が管理するもの（~/.zprezto/runcoms の実体） ---
 # repos の clone 後に配備される。prezto を update すれば symlink 先も更新される。
-# ~/.zshrc と ~/.zpreztorc は上の自前版を使うため対象外。
-"~/.zshenv"  = { source = "~/.zprezto/runcoms/zshenv", mode = "symlink" }
+# ~/.zshrc / ~/.zpreztorc / ~/.zshenv は上の自前版を使うため対象外。
 "~/.zlogin"  = { source = "~/.zprezto/runcoms/zlogin", mode = "symlink" }
 "~/.zlogout" = { source = "~/.zprezto/runcoms/zlogout", mode = "symlink" }
 

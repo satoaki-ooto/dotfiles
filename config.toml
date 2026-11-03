@@ -54,10 +54,13 @@
 "~/.pi/agent/settings.json/core"     = { source = "agents/pi/settings.json.tera", merge = true, template = "tera" }
 "~/.pi/agent/settings.json/defaults" = { source = "agents/pi/settings.defaults.json", merge = "missing" }
 
-# pi が書き換えないものはそのまま symlink。編集はリポジトリ側か実リンク側のどちらでも同じ
-"~/.pi/agent/models.json" = { source = "agents/pi/models.json", mode = "symlink" }
-"~/.pi/agent/AGENTS.md"   = { source = "agents/pi/AGENTS.md", mode = "symlink" }
-"~/.pi/agent/rules"       = { source = "agents/pi/rules", mode = "symlink-each" }
+# pi が書き換えないものは copy（実ファイル）として配る。
+# symlink だと sandbox 内で ~/.config/mise が見えず設定を読めず error になるため。
+# 編集は agents/pi/ 側で行い mise dot apply で反映する（ターゲット側を編集すると次の apply で上書きされる。
+# 取り込みたいときは mise dot add <ターゲット> で source に反映できる）
+"~/.pi/agent/models.json" = { source = "agents/pi/models.json", mode = "copy" }
+"~/.pi/agent/AGENTS.md"   = { source = "agents/pi/AGENTS.md", mode = "copy" }
+"~/.pi/agent/rules"       = { source = "agents/pi/rules", mode = "copy" }
 
 # ---------------------------------------------------------------
 # シェルへの mise 組み込み

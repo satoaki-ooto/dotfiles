@@ -3,6 +3,18 @@
 [mise bootstrap](https://mise.jdx.dev/bootstrap.html) で仕事 / 自宅の端末を同じ構成にするためのリポジトリ。
 `~/.config/mise` がこのリポジトリへの symlink になっており、mise のグローバル設定と zsh の runcom をまとめて管理する。
 
+## ドキュメント
+
+設定の詳細は `docs/` に分かれている。
+
+| ドキュメント | 内容 |
+|---|---|
+| [config.md](docs/config.md) | リポジトリの構成（各ファイルの役割） |
+| [zsh.md](docs/zsh.md) | zsh / prezto の管理分担・編集・設定 |
+| [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
+| [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
+| [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
+
 ## 新しい端末のセットアップ
 
 **手順は上から順に**。前の段が終わっていないと次は動かないので、各段の確認を通ってから進む。
@@ -36,7 +48,7 @@ mise bootstrap --adopt satoaki-ooto/dotfiles
 - adopt 自体も bootstrap を1回実行するが、**この時点では役割未選択なので共通設定だけ**が入る
 - `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージがここまでに揃う
 - prezto の runcoms（`~/.zlogin` / `~/.zlogout`）も clone 後に自動で symlink され、
-  `~/.zpreztorc` / `~/.zshenv` は自前管理版が配備される（下の「zsh の管理分担」）
+  `~/.zpreztorc` / `~/.zshenv` は自前管理版が配備される（管理分担の詳細は [docs/zsh.md](docs/zsh.md)）
 
 ### 2. 役割を選ぶ — `miserc.local.toml` を作る
 
@@ -63,6 +75,7 @@ mise bootstrap --dry-run && mise bootstrap
 
 - age 鍵 → `~/.config/sops/age/keys.txt`、secrets → `~/.config/secrets/`
 - どちらもリポジトリ外。無くてもシェルは起動する（ローダは存在チェックしてスキップする設計）
+- 詳細は [docs/secrets.md](docs/secrets.md)
 
 ### 5. 動作確認
 
@@ -92,179 +105,6 @@ mise bootstrap
 - その場限りで試す: `mise -E work bootstrap --dry-run`
 - モジュールが作ったものを除去: `mise bootstrap unapply work`
 
-## 構成
-
-| ファイル | 役割 |
-|---|---|
-| `config.toml` | 全端末共通（tools / packages / prezto clone / dotfiles 宣言） |
-| `config.personal.toml` | 自宅PC向け（`env = ["personal"]` で読み込まれる） |
-| `config.work.toml` | 会社PC向け（`env = ["work"]` で読み込まれる） |
-| `miserc.local.toml` | 端末ごとの役割選択（gitignored、同期されない） |
-| `zsh/zshrc` | `~/.zshrc` の実体（prezto の init 読み込み + ローダ） |
-| `zsh/zpreztorc` | `~/.zpreztorc` の実体。prezto の設定（テーマは pure） |
-| `zsh/zshenv` | `~/.zshenv` の実体。非対話シェル用の環境整備 |
-| `zsh/lib/` | `~/.zsh` の実体。全端末共通の断片 |
-| `zsh/personal/`, `zsh/work/` | 役割別の断片。`~/.zsh.personal` / `~/.zsh.work` として deploy |
-| `agents/shared/` | 全エージェント共通の指示（`AGENTS.md` / `rules/`） |
-| `agents/<agent>/` | エージェント固有の設定。対応する設定ディレクトリへ deploy |
-
-## コーディングエージェントの設定
-
-各エージェントの設定は `agents/<agent>/` に置き、`[dotfiles]` で deploy する。
-`AGENTS.md` と `rules/` は「全エージェントで共通」という位置づけなので `agents/shared/` に
-1 箇所だけ置き、pi と pig の両方から参照する。
-エージェント自身が書き換えるファイルは `merge` で「自分のキー」だけ管理し、
-そうでないものは `copy`（実ファイル）にする。symlink だと sandbox 内で
-`~/.config/mise` が見えず設定を読めないため。
-
-### pi（`agents/pi/` → `~/.pi/agent/`）
-
-| ファイル | 手法 | 内容 |
-|---|---|---|
-| `settings.json.tera` | `merge = true` + template | 強制するキー（`theme` / `extensions` / `packages`） |
-| `settings.defaults.json` | `merge = "missing"` | 既定値だけ配るキー（`defaultProvider` / `defaultModel` / `defaultThinkingLevel`） |
-| `models.json` | `copy` | 互換エンドポイントとモデル。API キーは `${RUNINFRA_GATEWAY_KEY}` の env 参照 |
-| `AGENTS.md` | `copy` | 全プロジェクト共通の指示（`agents/shared/` から） |
-| `rules/` | `copy` | `AGENTS.md` から `@rules/*.md` で読まれる断片（`agents/shared/rules/` から） |
-
-- `settings.json` は pi 自身も書き換える（`/settings`、`pi install`、アップグレード時の
-  `lastChangelogVersion` 更新）。`merge` にすることで pi の持つキーは壊さない
-- `merge = true` のキーはリポジトリが唯一の情報源。`pi install` した拡張は
-  `agents/pi/settings.json.tera` に書いてから `mise bootstrap` すると全機械に反映される
-  （書かないと次の bootstrap で元に戻る）
-- `merge = "missing"` のキーは `/model` で選んだ値を pi の所有物として扱う。
-  新しい端末では settings.json が無いので既定値が入り、`pi install` 直後から使える
-- `copy` のファイル（`models.json` / `AGENTS.md` / `rules/`）はターゲット側を編集すると
-  次の apply で上書きされる。編集は `agents/` 側で行い `mise dot apply` で反映する。
-  ターゲット側で編集した内容を取り込むときは `mise dot add ~/.pi/agent/AGENTS.md` のようにする
-  （ drift は `mise dot diff` で見える）
-- `{{ env.HOME }}` で絶対パスを展開するため、macOS（`/Users/...`）でも同じ source が使える
-- 管理しないもの: `auth.json`（資格情報。sops の `~/.config/secrets/` から env で渡す）、
-  `trust.json`（端末固有のパス）、`sessions/`、`bin/`、`install/`、`models-store.json`（キャッシュ）
-- `models.jsonc` は pi が読まない（pi は `models.json` のみ）。手元に残っていても無効
-- `models.json` はリポジトリに載せてよい（API キーは `${RUNINFRA_GATEWAY_KEY}` の env 参照で、
-  実値は sops の `~/.config/secrets/` 経由）。ただし provider 定義が無いと pi は起動しない
-  （`defaults` が `defaultProvider` を配るため）。リポジトリに載せたくない場合は
-  fnox（`mode = "fnox"` で age 暗号化配布）か sops + bootstrap task への移行を検討する
-
-### pig（`agents/pig/` → `~/.config/pig/agent/`）
-
-pi と同じ方式。`AGENTS.md` / `rules/` は `agents/shared/` を共有する。
-
-| ファイル | 手法 | 内容 |
-|---|---|---|
-| `settings.json` | `merge = true` | 強制するキー（`theme` / `enableAnalytics`） |
-| `settings.defaults.json` | `merge = "missing"` | 既定値だけ配るキー（`defaultProvider` / `defaultModel`） |
-| `models.json` | `copy` | runinfra の定義。pi の `models.json` と中身は別物（pig は `models.json` のみ読む） |
-| `AGENTS.md` / `rules/` | `copy` | `agents/shared/` から。pi と共通 |
-
-- pig の設定 root は `PIG_HOME` → `XDG_CONFIG_HOME` → `~/.pig` の順で決まる。
-  `config.personal.toml` の `[env]` で `PIG_HOME` を固定しているので、
-  `XDG_CONFIG_HOME` が無い環境（sandbox 等）でも `~/.config/pig` を見に行く
-- pig は `models.json` だけを読み、`models.jsonc` は参照しない。
-  手元に `models.jsonc` が残っていても無効（`[dotfiles]` の `absent` で消している）。
-  「pig が provider を見つけられない」原因はほぼこれ
-- pig は `PIG_USE_PI_DIRS=1` で pi の `~/.pi/agent` を共有できるが、
-  sessions / auth / trust も共有されるため使っていない（分離が pig の既定動作）
-
-### omp（`agents/omp/` → `~/.omp/agent/`）
-
-pi / pig と同じ方式。`AGENTS.md` / `rules/` は `agents/shared/` を共有する。
-設定ファイルは JSON ではなく YAML（`config.yml` / `models.yml`）で、
-merge は YAML を in-place 編集するので未管理キー（`setupVersion` 等）や
-コメント・キー順は保たれる。
-
-| ファイル | 手法 | 内容 |
-|---|---|---|
-| `config.yml` | `merge = true` | 強制するキー（`symbolPreset` / `theme` / `cycleOrder` / `prewalk` / `composer`） |
-| `config.defaults.yml` | `merge = "missing"` | 既定値だけ配るキー（`modelRoles` 各ロール / `defaultThinkingLevel`） |
-| `models.yml` | `copy` | runinfra の定義のみ。`apiKey: RUNINFRA_GATEWAY_KEY` は env 参照（`${}` 不要な omp 独自記法） |
-| `AGENTS.md` / `rules/` | `copy` | `agents/shared/` から。pi / pig と共通 |
-
-- `modelRoles`（smol / slow / plan / commit / task / default）は `/model` で選ぶと
-  omp が書き換えるので defaults 扱い。マップはキー単位で比較するため、
-  1 ロールだけ変えても他のロールは触られず、消されたロールだけ埋め直る
-- `mcp.json` / `RULES.md` は管理していない（`mcp.json` は端末依存の参照を含み、
-  `RULES.md` は端末ごとに変える運用のため）
-
-### ags（`agents/ags/` → `~/.config/ags/`）
-
-agent-sandbox（`ags` コマンド）。設定は TOML 1 ファイルで、pi / pig / omp と同じ merge 方式
-（mise は TOML も in-place 編集するのでコメント・キー順は保たれる）。
-
-| ファイル | 手法 | 内容 |
-|---|---|---|
-| `config.toml` | `merge = true` | 強制するキー（`[sandbox]` の image / パス類 / `passthrough_env` / `extra_dnf_packages`、`[[mount]]`、`[[agent_mount]]`、`[host_ui]` / `[clipboard]` / `[update]`） |
-| `config.defaults.toml` | `merge = "missing"` | 既定値だけ配るキー（`[sandbox].enabled_agents`。`ags tools` が書き換えるため） |
-
-- エントリは `config.personal.toml` 直書き（include には `[dotfiles]` を置けないため）
-- merge は配列を丸ごと置換する。`[[agent_mount]]` はリポジトリで所有するため
-  `ags install --add-agent-mounts` は使わない（足すときは `agents/ags/config.toml` 側へ）
-- `ags tools` が書く `[[tool]]`、`tool-downloads.*.lock.json`、`agent-providers.*.lock.json` は管理しない
-- `Containerfile` / `image/` / `tmux.conf` / `uv.toml` / `pi/` は ags が実行時に保証する
-  アセット（バージョン連動）なので管理しない
-- `~/.ssh/ags-agent-auth` / `ags-agent-signing` は `ags setup` が生成する端末ごとの鍵なので管理しない
-
-## zsh
-
-`mise bootstrap` は prezto の clone 後、runcoms を「自分で管理するもの」と
-「prezto が管理するもの」に分けて配備する。`~/.zprofile` だけは mise の
-shell activation と共存させるため、symlink ではなく source するブロックとして取り込む。
-`~/.zpreztorc` は prezto の既定を元にした自前管理版で、テーマは `pure`。
-`~/.zshenv` も prezto の `runcoms/zshenv` を元にした自前管理版で、中身は同じ。
-
-### 管理分担
-
-| ファイル | 管理 | 実体 |
-|---|---|---|
-| `~/.zshrc` | 自分 | `zsh/zshrc`（このリポジトリ） |
-| `~/.zsh`, `~/.zsh.<role>` | 自分 | `zsh/lib`, `zsh/personal`, `zsh/work` |
-| `~/.zpreztorc` | 自分 | `zsh/zpreztorc`（テーマ pure） |
-| `~/.zshenv` | 自分 | `zsh/zshenv` |
-| `~/.zlogin` | prezto | `~/.zprezto/runcoms/zlogin` |
-| `~/.zlogout` | prezto | `~/.zprezto/runcoms/zlogout` |
-| `~/.zprofile` | mise + prezto | mise の activation ブロック + `runcoms/zprofile` を source するブロック |
-
-- 自分側は `[dotfiles]` がこのリポジトリの実体へ、prezto 側は `~/.zprezto/runcoms` の実体へ symlink する
-- `~/.zshrc` / `~/.zpreztorc` / `~/.zshenv` は自前版を使うため、prezto の runcoms からは配備しない
-- `~/.zprofile` は `[bootstrap.mise_shell_activate]` が書くため symlink できない。
-  prezto の zprofile は source するブロックとして足し、内容だけ取り込む
-- 状態の確認は `mise dot status`、配備の取り消しは `mise dot unapply`
-- prezto 側は symlink なので、`mise bootstrap repos update` で更新すると次のシェルから反映される
-- `~/.zprezto` が未 clone の状態では `mise bootstrap --dry-run` は source missing で止まる
-  （dry-run は repos を clone しない）。先に `mise bootstrap repos apply` を実行するか、
-  そのまま `mise bootstrap` を実行すれば clone 後に配備される
-  （source missing になるのは prezto の実体を参照する `~/.zlogin` / `~/.zlogout` だけ。
-  `~/.zshenv` は自前管理なので prezto 未 clone でも配備できる）
-
-### 編集
-
-- `~/.zshrc` → `zsh/zshrc`、`~/.zsh` → `zsh/lib`、`~/.zpreztorc` → `zsh/zpreztorc`、
-  `~/.zshenv` → `zsh/zshenv` への symlink。編集はどちら側からでも同じ
-- [prezto](https://github.com/sorin-ionescu/prezto) は `~/.zprezto` に `[bootstrap.repos]` が clone する（submodules 込み）。更新は `mise bootstrap repos update`
-- ローダは `~/.zsh`、続いて `~/.zsh.*`（役割別）を `**/*.zsh` → `**/*.sh` の順で再帰 source。
-  役割側が後なので、共通の alias 等を役割別断片で上書きできる
-- 役割別断片は `zsh/personal/` / `zsh/work/`。config.personal.toml / config.work.toml が
-  `~/.zsh.personal` / `~/.zsh.work` として deploy する
-- リポジトリに載せない端末固有の断片は `*.local.sh` / `*.local.zsh`（gitignored）
-
-### prezto の設定（`zsh/zpreztorc`）
-
-- `~/.zpreztorc` は `zsh/zpreztorc` への symlink。prezto の `runcoms/zpreztorc` を元にした自前管理版
-- テーマは `pure`（`zstyle ':prezto:module:prompt' theme 'pure'`）。元の既定は `sorin`
-- pure のプロンプト記号などは `zsh/lib/98.theme.sh` で調整する（`PURE_PROMPT_SYMBOL`）
-- `~/.zprezto` 側の `runcoms/zpreztorc` は編集しない。編集すると `mise bootstrap repos update` が dirty で止まる
-- prezto の既定に追従したいときは、`~/.zprezto/runcoms/zpreztorc` と差分を確認してこのファイルへ取り込む
-
-### シェル環境（`zsh/zshenv`）
-
-- `~/.zshenv` は `zsh/zshenv` への symlink。prezto の `runcoms/zshenv` を元にした自前管理版
-- 役割は「ログインシェルでも対話シェルでもないとき、`~/.zprofile` を取り込む」こと
-  （`SHLEVL` が 1 かつ login でないとき）。`~/.zprofile` には mise の activation と
-  prezto の zprofile ブロックが入るので、非対話シェルでも環境変数が揃う
-- `~/.zprezto` 側の `runcoms/zshenv` は編集しない。編集すると `mise bootstrap repos update` が dirty で止まる
-- prezto の既定に追従したいときは、`~/.zprezto/runcoms/zshenv` と差分を確認してこのファイルへ取り込む
-
 ## 日々の運用
 
 - 編集はこのリポジトリ内で → `git commit`（SSH 署名は `commit.gpgsign` + `gpg.format=ssh` で自動）→ `git push`
@@ -293,8 +133,3 @@ mise bootstrap --adopt satoaki-ooto/dotfiles --update --yes
   `mise bootstrap --dry-run` する
 - `git pull && mise bootstrap` でも同じ結果になる（mise の外で checkout を更新する場合）
 - 反映後の確認: `mise bootstrap status` / `mise dot status`
-
-## 秘密情報
-
-- sops + age で暗号化。実ファイル（`~/.config/secrets/*.yaml`、age 鍵）は**このリポジトリに含めない**
-- 復号鍵は端末ごとに用意し、`SOPS_AGE_KEY_FILE` で場所を指定（`zsh/lib/01.env.sh`）

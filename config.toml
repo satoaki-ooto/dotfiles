@@ -67,6 +67,8 @@
 "~/.pi/agent/models.json"          = { source = "agents/pi/models.json", mode = "copy" }
 "~/.pi/agent/AGENTS.md"            = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.pi/agent/rules"                = { source = "agents/shared/rules", mode = "copy" }
+# ~/.pi/agent/extensions/ は拡張の自動検出対象。settings.json への追記は不要
+"~/.pi/agent/extensions/guard-git-push.ts" = { source = "agents/pi/extensions/guard-git-push.ts", mode = "copy" }
 "~/.config/pig/agent/models.json"  = { source = "agents/pig/models.json", mode = "copy" }
 "~/.config/pig/agent/AGENTS.md"    = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.config/pig/agent/rules"        = { source = "agents/shared/rules", mode = "copy" }

@@ -21,6 +21,16 @@ include = [
   "packages/uv.toml",
 ]
 
+[settings]
+# paranoid の config カテゴリは local include を拒否するため外している。
+# true は全カテゴリ（config / env_files / plugins / provenance）の指定と同じ。
+# provenance（GitHub attestations / SLSA）と plugins / env_files は維持。
+paranoid = ["env_files", "plugins", "provenance"]
+minimum_release_age = "3d"
+disable_tools = ["python", "python3"]
+experimental = false
+npm.package_manager = "bun"
+
 [tools]
 # kubectl = "latest"
 

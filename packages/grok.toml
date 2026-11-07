@@ -1,6 +1,8 @@
 # grok（aqua:x.ai/cli/grok）
 [tools."aqua:x.ai/cli/grok"]
-version = "latest"
+# aqua レジストリに repo_owner/repo_name が無いため latest が解決できず
+# バージョン固定が必須。新版は mise-versions.jdx.dev/tools/grok で確認して手動更新する
+version = "1.0.77"
 
 [env]
 GROK_DISABLE_AUTOUPDATER = "1"

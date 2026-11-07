@@ -1,7 +1,11 @@
 # set SSH_AUTH_SOCK
 _configure_ssh_agent() {
     # SSH 転送や macOS launchd など、既に有効なソケットを指している場合はそのままにする
-    [ -S "${SSH_AUTH_SOCK:-}" ] && return
+    # ただし gcr-agent (GNOME) は Keeper/Bitwarden を優先したいので対象外
+    case "${SSH_AUTH_SOCK:-}" in
+        ""|*/gcr/ssh) ;;
+        *) [ -S "$SSH_AUTH_SOCK" ] && return ;;
+    esac
 
     local _os _sock
     _os="$(uname -s)"

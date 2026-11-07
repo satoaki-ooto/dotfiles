@@ -1,0 +1,6 @@
+# claude（aqua:anthropics/claude-code）
+[tools."aqua:anthropics/claude-code"]
+version = "latest"
+
+[env]
+DISABLE_AUTOUPDATER = "1"

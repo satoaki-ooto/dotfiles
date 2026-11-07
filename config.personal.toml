@@ -10,6 +10,7 @@
 include = [
   "packages/agent-hop.toml",
   "packages/ags.toml",
+  "packages/agy.toml",
   "packages/bun.toml",
   "packages/cf.toml",
   "packages/claude.toml",

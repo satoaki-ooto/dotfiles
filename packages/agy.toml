@@ -1,0 +1,8 @@
+# agy（aqua:google-antigravity/antigravity-cli）
+[tools."aqua:google-antigravity/antigravity-cli"]
+version = "latest"
+
+[env]
+# 自動更新の無効化。値は "true" 固定。"1" は効かない
+# （google-antigravity/antigravity-cli#1046 が open のため）
+AGY_CLI_DISABLE_AUTO_UPDATE = "true"

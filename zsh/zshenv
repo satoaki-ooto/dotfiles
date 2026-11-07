@@ -8,6 +8,10 @@
 # ~/.zprezto 側を編集すると repos update が dirty で止まるため、設定はここで行う。
 #
 
+# ~/.zprofile の mise activation（裸の mise 参照）が login shell でも通るよう
+# ~/.local/bin を PATH に入れる。zshenv は全 zsh で最初に読まれるためここで設定する
+export PATH="$HOME/.local/bin:$PATH"
+
 # Ensure that a non-login, non-interactive shell has a defined environment.
 if [[ ( "$SHLVL" -eq 1 && ! -o LOGIN ) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprofile"

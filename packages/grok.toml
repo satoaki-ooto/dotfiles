@@ -1,0 +1,6 @@
+# grok（aqua:x.ai/cli/grok）
+[tools."aqua:x.ai/cli/grok"]
+version = "latest"
+
+[env]
+GROK_DISABLE_AUTOUPDATER = "1"

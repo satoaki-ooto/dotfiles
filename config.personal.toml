@@ -25,7 +25,6 @@ include = [
   "packages/pi.toml",
   "packages/pig.toml",
   "packages/pnpm.toml",
-#  "packages/smolvm.toml",
   "packages/sops.toml",
   "packages/strix.toml",
   "packages/uv.toml",

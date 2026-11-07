@@ -11,6 +11,7 @@ include = [
   "packages/agent-hop.toml",
   "packages/ags.toml",
   "packages/agy.toml",
+  "packages/aube.toml",
   "packages/bun.toml",
   "packages/cf.toml",
   "packages/claude.toml",
@@ -24,7 +25,7 @@ include = [
   "packages/pi.toml",
   "packages/pig.toml",
   "packages/pnpm.toml",
-  "packages/smolvm.toml",
+#  "packages/smolvm.toml",
   "packages/sops.toml",
   "packages/strix.toml",
   "packages/uv.toml",
@@ -41,10 +42,13 @@ paranoid = ["env_files", "plugins", "provenance"]
 minimum_release_age = "3d"
 disable_tools = ["python", "python3"]
 experimental = false
-npm.package_manager = "bun"
+npm.package_manager = "aube"
 
 [env]
 OPENSPEC_TELEMETRY = "0"
+# aube の typosquat ガード（週 1000 DL 未満は non-interactive で拒否）から
+# agent-hop だけ除外する。cf / zro など他のパッケージにはガードを効かせたままにする
+AUBE_ALLOWED_UNPOPULAR_PACKAGES = "agent-hop"
 # pig の設定 root を固定する。pig は PIG_HOME > XDG_CONFIG_HOME > ~/.pig の順で決めるため、
 # XDG_CONFIG_HOME が無い環境（sandbox 等）でも ~/.config/pig を見に行く
 PIG_HOME = "${HOME}/.config/pig"

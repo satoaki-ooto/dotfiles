@@ -1,0 +1,3 @@
+# aube（npm 互換クライアント。provenance 検証に対応しているので npm backend の既定に使う）
+[tools]
+aube = "latest"

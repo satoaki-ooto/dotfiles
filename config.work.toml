@@ -15,6 +15,7 @@ include = [
   "packages/microsandbox.toml",
   "packages/node.toml",
   "packages/nono.toml",
+  "packages/octet.toml",
   "packages/omp.toml",
   "packages/pi.toml",
   "packages/pig.toml",

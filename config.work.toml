@@ -11,6 +11,7 @@ include = [
   "packages/ags.toml",
   "packages/bun.toml",
   "packages/command-code.toml",
+  "packages/gh.toml",
   "packages/microsandbox.toml",
   "packages/node.toml",
   "packages/nono.toml",

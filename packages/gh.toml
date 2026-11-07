@@ -1,0 +1,3 @@
+# gh（GitHub CLI）
+[tools]
+gh = "latest"

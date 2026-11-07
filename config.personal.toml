@@ -15,6 +15,7 @@ include = [
   "packages/cf.toml",
   "packages/claude.toml",
   "packages/command-code.toml",
+  "packages/gh.toml",
   "packages/go.toml",
   "packages/grok.toml",
   "packages/node.toml",

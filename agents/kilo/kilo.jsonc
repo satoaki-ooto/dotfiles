@@ -1,0 +1,41 @@
+{
+  // kilo 自身も kilo.jsonc を書き換える（/models でのモデル選択等。jsonc を
+  // in-place patch するので未管理キー・コメントは保たれる）。
+  // ここは「リポジトリが唯一の情報源」として強制するキーのみ。
+  // アプリが書き換えるキーは kilo.defaults.jsonc（merge = "missing"）へ。
+  "$schema": "https://app.kilo.ai/config.json",
+
+  // 新規セッションは Plan Agent から開始する
+  "default_agent": "plan",
+
+  // タイトル生成などの軽量処理に使うモデル
+  "small_model": "kilo/kilo-auto/custom/small",
+
+  // Kilo Gateway のみを有効化する。
+  // RUNINFRA_GATEWAY_KEY が環境にあっても、RunInfra をモデル一覧・利用対象から除外する。
+  // 注意: 環境変数自体の秘匿や削除を行う設定ではない。
+  "enabled_providers": ["kilo"],
+
+  // 新しいバージョンは通知のみ受け取り、自動更新しない
+  "autoupdate": "notify",
+
+  // 自動共有は行わず、明示的に /share した場合だけ共有する
+  "share": "manual",
+
+  // 推論とターミナルコマンドは展開し、コード差分と MCP 結果は折りたたむ
+  "reasoning_display": "expanded",
+  "terminal_command_display": "expanded",
+  "code_edit_display": "collapsed",
+  "mcp_tool_display": "collapsed",
+
+  "agent": {
+    // 会話圧縮は全 Agent 共通で small モデルを使う
+    "compaction": {
+      "model": "kilo/kilo-auto/custom/small"
+    },
+    // 旧 Orchestrator は使用しない
+    "orchestrator": {
+      "disable": true
+    }
+  }
+}

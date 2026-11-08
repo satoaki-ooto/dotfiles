@@ -1,0 +1,18 @@
+{
+  // セッション agent のモデル。kilo の /models で選ぶと kilo 側が書き換えるため
+  // defaults（無いときだけ埋める）扱い。強制したい場合は kilo.jsonc（core）側へ移す。
+  "agent": {
+    "ask": {
+      "model": "kilo/kilo-auto/custom/ask"
+    },
+    "plan": {
+      "model": "kilo/kilo-auto/custom/plan"
+    },
+    "code": {
+      "model": "kilo/kilo-auto/custom/code"
+    },
+    "debug": {
+      "model": "kilo/kilo-auto/custom/debug"
+    }
+  }
+}

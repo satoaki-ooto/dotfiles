@@ -12,7 +12,7 @@
 | [config.md](docs/config.md) | リポジトリの構成（各ファイルの役割） |
 | [zsh.md](docs/zsh.md) | zsh / prezto の管理分担・編集・設定 |
 | [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
-| [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
+| [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
 | [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
 
 ## 新しい端末のセットアップ

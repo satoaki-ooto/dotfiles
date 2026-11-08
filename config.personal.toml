@@ -64,3 +64,10 @@ PIG_HOME = "${HOME}/.config/pig"
 # アセット（Containerfile / image/ / tmux.conf / uv.toml / pi/）は ags install が配るので管理しない
 "~/.config/ags/config.toml/core"     = { source = "agents/ags/config.toml", merge = true }
 "~/.config/ags/config.toml/defaults" = { source = "agents/ags/config.defaults.toml", merge = "missing" }
+
+# kilo。kilo 自身も /models などで kilo.jsonc を書き換える（jsonc を in-place
+# patch するので未管理キー・コメントは保たれる）ため merge で管理する。
+# セッション agent のモデル（ask / plan / code / debug）は /models で
+# 書き換わるので defaults。それ以外は kilo.jsonc（core）で強制する。
+"~/.config/kilo/kilo.jsonc/core"     = { source = "agents/kilo/kilo.jsonc", merge = true }
+"~/.config/kilo/kilo.jsonc/defaults" = { source = "agents/kilo/kilo.defaults.jsonc", merge = "missing" }

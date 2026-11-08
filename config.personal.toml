@@ -19,6 +19,7 @@ include = [
   "packages/gh.toml",
   "packages/go.toml",
   "packages/grok.toml",
+  "packages/kilo.toml",
   "packages/node.toml",
   "packages/octet.toml",
   "packages/omp.toml",

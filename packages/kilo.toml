@@ -1,0 +1,23 @@
+# Kilo Code（npm:@kilocode/cli）
+#
+# bin は kilo / kilocode の 2 つ。本体はプラットフォーム別の
+# optionalDependencies（@kilocode/cli-{linux,darwin,windows}-{x64,arm64,...}）に
+# 入っており、npm 側は薄いラッパー。
+#
+# aube 経由での注意点（確認済み: 2026-11 / v7.8.26）:
+# - aube は allowBuilds に載っていないパッケージの lifecycle script を実行しない。
+#   このパッケージの postinstall は「プラットフォーム別バイナリを bin/.kilo に
+#   コピーする」ものだが、スキップされても bin/kilo が node_modules から
+#   実体を探すフォールバックを持つため動作する（mise は実体を
+#   node_modules/.mise/node_modules/ 配下に置く）。`aube ignored-builds` も空。
+#   将来このフォールバックが無くなったら npm_args で scripts を許可する必要がある
+# - typosquat ガード（週 1000 DL 未満を拒否）は通る（週 5 万 DL 超）
+#   AUBE_ALLOWED_UNPOPULAR_PACKAGES への追加は不要
+# - registry に SLSA provenance があるため paranoid = provenance と両立する
+#
+# 自動更新の仕組みは無い（KILO_DISABLE_AUTOUPDATE 等の env も無い）。
+# 更新は mise 経由（kilo upgrade は使わない）。よって [env] は定義しない。
+[tools."npm:@kilocode/cli"]
+version = "latest"
+# リリース間隔が短い（週数回）ので他エージェント CLI と同じく age 制限を外す
+minimum_release_age = "0d"

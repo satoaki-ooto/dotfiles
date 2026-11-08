@@ -1,7 +1,19 @@
 # dotfiles
 
 [mise bootstrap](https://mise.jdx.dev/bootstrap.html) で仕事 / 自宅の端末を同じ構成にするためのリポジトリ。
-`~/.config/mise` がこのリポジトリへの symlink になっており、mise のグローバル設定と zsh の runcom をまとめて管理する。
+`~/.config/mise` 自体がこのリポジトリの Git checkout であり、mise のグローバル設定と zsh の runcom をまとめて管理する。
+
+## 管理方針
+
+| 対象 | 担当 |
+|---|---|
+| `~/.config/mise` の履歴・端末間の共有 | Git（SSH remote） |
+| 設定に宣言した状態の端末への配備 | `mise bootstrap` |
+| 配備済みファイルの差分確認・copy target の逆取り込み | `mise dot` |
+
+- Git の commit / push を変更管理の正本にする
+- `mise dot track` / `sync` / `pull` / `origin` は使わない
+- `mise dot` は deployment の確認と、copy したファイルの編集を source に戻す用途に限定する
 
 ## ドキュメント
 
@@ -32,62 +44,78 @@
 - 既に `~/.config/mise` がある（昔 mise を使っていた）場合は退避:
   `mv ~/.config/mise ~/.config/mise.bak`
 
-### 1. adopt — このリポジトリを `~/.config/mise` に取り込む
+### 1. adopt — リポジトリを取り込み、端末の役割も同時に選ぶ
+
+自宅PC:
 
 ```sh
-mise bootstrap --adopt satoaki-ooto/dotfiles
+mise -E personal bootstrap --adopt satoaki-ooto/dotfiles --save-env
 ```
 
-- 既存の `~/.zshrc` などが食い違うと adopt は**何も適用せずに止まる**（上書きしない）。
-  確認して取り込む:
-  ```sh
-  mise dot status
-  mise dot pull --take-remote-all   # 置き換え前の版は保存されるので mise dot undo で戻せる
-  mise bootstrap
-  ```
-- adopt 自体も bootstrap を1回実行するが、**この時点では役割未選択なので共通設定だけ**が入る
-- `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージがここまでに揃う
+会社PC:
+
+```sh
+mise -E work bootstrap --adopt satoaki-ooto/dotfiles --save-env
+```
+
+- `--adopt` はこのリポジトリを `~/.config/mise` の Git checkout として clone し、bootstrap を実行する
+- `-E personal` / `-E work` で `config.personal.toml` / `config.work.toml` を最初の実行から読み込む
+- `--save-env` は選択した役割を gitignored の `miserc.local.toml` に保存する。
+  これにより「共通設定を入れてから、役割を選んで再度 bootstrap」という2段階が不要になる
+- `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージと役割分のパッケージがこの実行で揃う
 - prezto の runcoms（`~/.zlogin` / `~/.zlogout`）も clone 後に自動で symlink され、
   `~/.zpreztorc` / `~/.zshenv` は自前管理版が配備される（管理分担の詳細は [docs/zsh.md](docs/zsh.md)）
 
-### 2. 役割を選ぶ — `miserc.local.toml` を作る
+`--save-env` が使えない mise の場合は、adopt 後に `miserc.local.toml` を手動作成してから
+もう一度 bootstrap する。
 
 ```sh
+mise bootstrap --adopt satoaki-ooto/dotfiles
+
 printf 'env = ["personal"]\n' > ~/.config/mise/miserc.local.toml   # 自宅PC
 # printf 'env = ["work"]\n'    > ~/.config/mise/miserc.local.toml   # 会社PC
 
 mise config   # config.personal.toml（または config.work.toml）が読み込まれていることを確認
-```
-
-- このファイルは gitignored なので adopt では来ない。**必ずここで手動作成**
-- 詳細は下の「端末の役割を選ぶ」
-
-### 3. もう一度 bootstrap — 役割分（モジュール）を適用
-
-```sh
 mise bootstrap --dry-run && mise bootstrap
 ```
 
-- **adopt だけでは personal / work の分は入らない**。役割選択後に bootstrap を
-  走らせて初めて入る（ここを忘れやすい）
+### 2. 既存ファイルと競合した場合
 
-### 4. 秘密情報（sops）を手動で移す
+既存の `~/.zshrc` などがリポジトリ側と食い違うと、adopt は**上書きせずに止まる**。
+`mise dot status` と `mise dot diff` で内容を確認し、必要な既存ファイルを退避してから取り込む。
+
+```sh
+mise dot status
+mise dot diff
+
+# 退避と確認が済んだら、競合する whole-file entry をリポジトリ側で置き換える
+mise bootstrap --force-dotfiles
+```
+
+- `mise dot pull --take-remote-all` は使わない。
+  これは mise の dotfile history（setup repository）向けの操作であり、現在の Git checkout 運用とは別物
+- この構成では追跡済みの dotfile history を持たないため、置き換え前の内容は必要なら自分で退避する
+- `git status` が汚れている状態で adopt / update すると止まることがある。commit または stash してから実行する
+
+### 3. 秘密情報（sops）を手動で移す
 
 - age 鍵 → `~/.config/sops/age/keys.txt`、secrets → `~/.config/secrets/`
 - どちらもリポジトリ外。無くてもシェルは起動する（ローダは存在チェックしてスキップする設計）
 - 詳細は [docs/secrets.md](docs/secrets.md)
 
-### 5. 動作確認
+### 4. 動作確認
 
 ```sh
 mise doctor
+mise bootstrap status
+mise dot status
 exec zsh   # 新しいシェルで zshrc が読めるか
 ```
 
 ## 端末の役割を選ぶ（personal / work）
 
 共通設定は `config.toml`。端末固有の差分はモジュールとして分かれており、
-各端末の `miserc.local.toml` で選択する（**gitignored**: 端末ごとに1回作る）:
+各端末の `miserc.local.toml` で選択する（**gitignored**: 端末ごとに1回作る）。
 
 ```sh
 # 自宅PC
@@ -107,29 +135,146 @@ mise bootstrap
 
 ## 日々の運用
 
-- 編集はこのリポジトリ内で → `git commit`（SSH 署名は `commit.gpgsign` + `gpg.format=ssh` で自動）→ `git push`
-- もう1台への反映は下の「更新を反映する」
-- 設定の履歴・差分: `mise dot history` / `mise dot diff`
+変更はすべて Git に記録する。
 
-### 更新を反映する
+1. このリポジトリ内の source を編集する
+2. 必要なら端末へ配備する
+3. `git diff` を確認して commit / push
+4. 他の端末では `mise bootstrap --update` で反映する
 
-既存の端末でリモートの変更を反映する。`--adopt` は既存の `~/.config/mise` checkout を
-再利用し、`--update` が `origin/main` まで fast-forward してから bootstrap を実行する。
+### repo 内の source を編集した場合
+
+`config.toml`、`config.personal.toml`、`agents/`、`zsh/` などを編集する通常のケース。
 
 ```sh
-# dotfiles / zsh の変更だけ反映する
-mise bootstrap --adopt satoaki-ooto/dotfiles --update \
-  --only dotfiles,mise-shell-activate --yes
+# dotfiles の変更を端末へ配備
+mise dot diff
+mise dot apply
 
-# tools / packages / prezto も含めて反映する
-mise bootstrap --adopt satoaki-ooto/dotfiles --update --yes
+# tools / packages / repos を含めて配備
+mise bootstrap
+
+# 変更管理
+git diff
+git add ...
+git commit
+git push
 ```
 
-- `mise bootstrap --update` 単体では `~/.config/mise` は更新されない
-  （`[bootstrap.repos]` の prezto とパッケージメタデータだけが更新される）
+- `git status` は repo の source と HEAD の差分を見る
+- `mise dot diff` は配備先 target と source の差分を見る
+- source だけを変更した直後は、`git status` に差分があっても
+  `mise dot diff` が `all files are applied` のままのことがある。これは異常ではない
+- `mise dot add` は repo 内の設定ファイルを記録するコマンドではない。変更管理は Git で行う
+
+### copy で配備した target を編集した場合
+
+copy 対象は `config.toml` の `mode = "copy"` で宣言されている。
+
+| 配備先 target | repo 内の source |
+|---|---|
+| `~/.pi/agent/models.json` | `agents/pi/models.json` |
+| `~/.pi/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
+| `~/.pi/agent/rules/` | `agents/shared/rules/` |
+| `~/.pi/agent/extensions/guard-git-push.ts` | `agents/pi/extensions/guard-git-push.ts` |
+| `~/.config/pig/agent/models.json` | `agents/pig/models.json` |
+| `~/.config/pig/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
+| `~/.config/pig/agent/rules/` | `agents/shared/rules/` |
+| `~/.omp/agent/models.yml` | `agents/omp/models.yml` |
+| `~/.omp/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
+| `~/.omp/agent/rules/` | `agents/shared/rules/` |
+
+ファイルの copy target を直接編集した場合は、差分を source に戻してから Git に記録する。
+
+```sh
+mise dot diff
+
+# どの source が更新されるか確認
+mise dot add --changed --dry-run
+
+# copy mode のファイルの変更を repo 内の source へ戻す
+mise dot add --changed
+
+git diff
+git add ...
+git commit
+git push
+```
+
+個別に戻す場合:
+
+```sh
+mise dot add ~/.pi/agent/models.json
+```
+
+- `mise dot add --changed` は copy mode の通常ファイルが対象。`merge` entry は対象外
+- `rules/` のようなディレクトリ copy は、target 側ではなく `agents/shared/rules/` の source を直接編集する
+- `AGENTS.md` の source は pi / pig / omp で共通。1つの target から取り込むと全エージェントに影響する
+- `dot diff` は配備差分、`git status` は repo の変更を見ている。両方を確認する
+
+### symlink / merge で配備した target
+
+| mode | target を編集したとき |
+|---|---|
+| `symlink` | target と source が同じ実体なので、repo の変更として `git commit` する |
+| `copy` | `mise dot add --changed` で source に戻してから `git commit` する |
+| `merge` | repo が管理するキーは source を編集する。アプリが管理するキーは端末ローカルに残す |
+
+`merge` の対象は `settings.json`、`config.yml`、`kilo.jsonc` など。
+アプリの UI で変更した値をそのまま repo に取り込むのではなく、repo 側で管理するキーだけを編集する。
+
+## リモートの変更を反映する
+
+既存端末で `origin/main` の変更を取得し、bootstrap まで実行する。
+
+```sh
+mise bootstrap --update
+```
+
+`--update` は次を行う。
+
+1. `~/.config/mise` の Git checkout を upstream まで fast-forward
+2. package metadata と `[bootstrap.repos]`（prezto など）を更新
+3. 更新後の設定で bootstrap
+
+dotfiles と shell activation だけを反映する場合:
+
+```sh
+mise bootstrap --update --only dotfiles,mise-shell-activate --yes
+```
+
+- 日常の更新で `git pull` を別途実行する必要はない
+- 明示的にリポジトリを指定する場合は、既存 checkout を再利用する形でも同じことができる:
+  `mise bootstrap --adopt satoaki-ooto/dotfiles --update`
 - checkout に未コミットの変更があると fast-forward で止まる。commit / stash してから実行する
-- `--dry-run` は checkout を更新せず、**現在の commit** の内容で計画を出す。
-  更新後の内容を確認したい場合は、先に `git -C ~/.config/mise pull --ff-only` してから
-  `mise bootstrap --dry-run` する
-- `git pull && mise bootstrap` でも同じ結果になる（mise の外で checkout を更新する場合）
+- `--dry-run` は checkout を更新せず、現在の commit の内容で計画を出す。
+  更新後の内容を先に確認したい場合は、`mise bootstrap --update` の後に
+  `git log -1` / `git status` と `mise bootstrap status` を確認する
+- `mise dot pull` / `mise dot sync` はこの更新には使わない
 - 反映後の確認: `mise bootstrap status` / `mise dot status`
+- 設定から削除したツールは自動ではアンインストールされない。
+  不要になったものは `mise ls --prunable` と `mise prune --dry-run` を確認して別途削除する
+
+## SSH 先の端末へ反映する
+
+SSH 先にも、送信元と同じ Git commit を `--adopt --update` で適用する。
+
+```sh
+mise bootstrap remote \
+  --host <HOST> \
+  --adopt git@github.com:satoaki-ooto/dotfiles.git \
+  --remote-env personal \
+  --update \
+  --dry-run
+```
+
+内容を確認したら `--dry-run` を外す。会社PCなら `--remote-env work` にする。
+
+- SSH 先の既存 `~/.config/mise` checkout が再利用され、fast-forward 後に bootstrap が実行される
+- 新規ホストでは `--install-mise` を追加する
+- `--remote-env` はその実行限りの選択。端末に常設する役割は、そのホストの
+  `miserc.local.toml` に保存する
+- adopt 済みホストでは `--source` を使わない。
+  送信元の一時 project と SSH 先の global config という2経路になり、管理が分かれるため
+- `--dry-run` でも SSH 接続、転送、ホストの検査は行われる
+- 反映後の確認はホスト上で `mise bootstrap status` / `mise dot status`

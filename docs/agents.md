@@ -10,5 +10,6 @@
 - [pi](pi.md)（`agents/pi/` → `~/.pi/agent/`）
 - [pig](pig.md)（`agents/pig/` → `~/.config/pig/agent/`）
 - [omp](omp.md)（`agents/omp/` → `~/.omp/agent/`）
+- [octet](octet.md)（`agents/shared/` → `~/.octet/`）
 - [kilo](kilo.md)（`agents/kilo/` → `~/.config/kilo/kilo.jsonc`）
 - [ags](ags.md)（`agents/ags/` → `~/.config/ags/`）

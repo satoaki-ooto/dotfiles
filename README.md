@@ -24,7 +24,7 @@
 | [config.md](docs/config.md) | リポジトリの構成（各ファイルの役割） |
 | [zsh.md](docs/zsh.md) | zsh / prezto の管理分担・編集・設定 |
 | [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
-| [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
+| [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [octet.md](docs/octet.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
 | [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
 
 ## 新しい端末のセットアップ
@@ -183,6 +183,8 @@ copy 対象は `config.toml` の `mode = "copy"` で宣言されている。
 | `~/.omp/agent/models.yml` | `agents/omp/models.yml` |
 | `~/.omp/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
 | `~/.omp/agent/rules/` | `agents/shared/rules/` |
+| `~/.octet/AGENTS.md` | `agents/shared/AGENTS.md` |
+| `~/.octet/rules/` | `agents/shared/rules/` |
 
 ファイルの copy target を直接編集した場合は、差分を source に戻してから Git に記録する。
 
@@ -209,7 +211,7 @@ mise dot add ~/.pi/agent/models.json
 
 - `mise dot add --changed` は copy mode の通常ファイルが対象。`merge` entry は対象外
 - `rules/` のようなディレクトリ copy は、target 側ではなく `agents/shared/rules/` の source を直接編集する
-- `AGENTS.md` の source は pi / pig / omp で共通。1つの target から取り込むと全エージェントに影響する
+- `AGENTS.md` の source は pi / pig / omp / octet で共通。1つの target から取り込むと全エージェントに影響する
 - `dot diff` は配備差分、`git status` は repo の変更を見ている。両方を確認する
 
 ### symlink / merge で配備した target

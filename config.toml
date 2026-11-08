@@ -76,6 +76,11 @@
 "~/.omp/agent/AGENTS.md"           = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.omp/agent/rules"               = { source = "agents/shared/rules", mode = "copy" }
 
+# octet: ~/.octet/config.toml / credentials/ はアプリが管理する（config.toml.lock 付き）ので対象外。
+# AGENTS.md と rules だけ copy する。
+"~/.octet/AGENTS.md" = { source = "agents/shared/AGENTS.md", mode = "copy" }
+"~/.octet/rules"     = { source = "agents/shared/rules", mode = "copy" }
+
 # pig は models.json だけを読む（models.jsonc は未参照のため無効）。
 # models.jsonc は誤認のもとになるので配備時に消す（内容は agents/pig/models.json に移行済み）
 "~/.config/pig/agent/models.jsonc" = { mode = "absent" }

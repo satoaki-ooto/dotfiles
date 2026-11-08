@@ -19,8 +19,8 @@
   // 新しいバージョンは通知のみ受け取り、自動更新しない
   "autoupdate": "notify",
 
-  // セッション共有を完全に無効化するへ変更する
-  "share": "disable",
+  // セッション共有を完全に無効化する
+  "share": "disabled",
 
   // 推論とターミナルコマンドは展開し、コード差分と MCP 結果は折りたたむ
   "reasoning_display": "expanded",

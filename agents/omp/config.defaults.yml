@@ -1,8 +1,8 @@
 modelRoles:
   smol: kilo/z-ai/glm-5.3-flash:max
-  slow: deepseek/deepseek-v4.1-flash:max
-  plan: kilo/moonshotai/kimi-k3.1-pro:high
+  slow: kilo/deepseek/deepseek-v4.1-flash-1017:max
+  plan: kilo/kilo-auto/custom/plan
   commit: kilo/z-ai/glm-5.3-flash:low
-  task: deepseek/deepseek-v4.1-flash:high
+  task: kilo/deepseek/deepseek-v4.1-flash-1017:high
   default: kilo/moonshotai/kimi-k3.1-pro:high
 defaultThinkingLevel: auto

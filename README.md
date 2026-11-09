@@ -62,7 +62,16 @@ mise -E work bootstrap --adopt satoaki-ooto/dotfiles --save-env
 - `-E personal` / `-E work` で `config.personal.toml` / `config.work.toml` を最初の実行から読み込む
 - `--save-env` は選択した役割を gitignored の `miserc.local.toml` に保存する。
   これにより「共通設定を入れてから、役割を選んで再度 bootstrap」という2段階が不要になる
-- `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージと役割分のパッケージがこの実行で揃う
+- `~/.zshrc` / `~/.zsh` の symlink、prezto の clone、共通パッケージがこの実行で揃う
+- 役割分のパッケージは、この実行の dotfiles 手順で `~/.config/mise/conf.d/` に symlink される。
+  同じ実行の tools 手順でインストールされるかは未確認なので、次で確認し、
+  足りなければもう一度 bootstrap する（bootstrap は冪等なので 2 回実行しても問題ない）
+
+  ```sh
+  ls ~/.config/mise/conf.d/   # 役割のパッケージの symlink があるか
+  mise ls --current           # 役割のツールが出ているか。(missing) があれば次を実行
+  mise bootstrap
+  ```
 - prezto の runcoms（`~/.zlogin` / `~/.zlogout`）も clone 後に自動で symlink され、
   `~/.zpreztorc` / `~/.zshenv` は自前管理版が配備される（管理分担の詳細は [docs/zsh.md](docs/zsh.md)）
 

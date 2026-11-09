@@ -29,6 +29,9 @@
   もう一方の役割で使わないなら、そちらに `{ mode = "absent" }` を足す
 - 外す: エントリを `{ mode = "absent" }` に書き換える。エントリを消すだけだと配備済みの
   symlink が `conf.d/` に残り、読まれ続ける
-- 反映: `mise dot apply`（または `mise bootstrap`）。config を書き換えただけでは効かない
-- 新端末: `conf.d/` は bootstrap の dotfiles 手順で作られる。同じ実行の tools 手順で
-  読まれない場合は、もう一度 `mise bootstrap` する
+- 反映: `mise dot apply` で `conf.d/` の symlink を作り直し、追加したパッケージは続けて
+  `mise install` でインストールする（`mise bootstrap` なら両方を行う）。
+  `mise dot apply` だけではツールはインストールされず、config を書き換えただけでは symlink も変わらない
+- 新端末: `conf.d/` は bootstrap の dotfiles 手順で作られる。同じ実行の tools 手順がそれを
+  読むかは未確認のため、adopt 後に `mise ls --current` で役割分のツールを確認し、
+  足りなければもう一度 `mise bootstrap` する（README の手順 1 を参照。bootstrap は冪等）

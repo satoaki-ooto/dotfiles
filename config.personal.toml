@@ -50,7 +50,8 @@ PIG_HOME = "${HOME}/.config/pig"
 # パッケージ（packages/<name>.toml を ~/.config/mise/conf.d/ に symlink する）
 # この一覧が「この端末で使うもの」。conf.d/ は global config として読まれるので、
 # paranoid の config カテゴリでも承認なしで読まれる（local include は拒否される）。
-# 追加: エントリを足して mise dot apply。外す: source を消して mode = "absent" にする
+# 追加: エントリを足して mise dot apply → mise install（または mise bootstrap）。
+# 外す: source を消して mode = "absent" にして mise dot apply
 # （エントリを消すだけだと配備済みの symlink が残り、読まれ続ける）
 # ---------------------------------------------------------------
 "~/.config/mise/conf.d/agent-hop.toml"    = { source = "packages/agent-hop.toml", mode = "symlink" }

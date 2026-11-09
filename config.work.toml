@@ -48,9 +48,12 @@ npm.package_manager = "bun"
 # （エントリを消すだけだと配備済みの symlink が残り、読まれ続ける）
 # ---------------------------------------------------------------
 "~/.config/mise/conf.d/ags.toml"          = { source = "packages/ags.toml", mode = "symlink" }
+"~/.config/mise/conf.d/aube.toml"         = { source = "packages/aube.toml", mode = "symlink" }
 "~/.config/mise/conf.d/bun.toml"          = { source = "packages/bun.toml", mode = "symlink" }
 "~/.config/mise/conf.d/command-code.toml" = { source = "packages/command-code.toml", mode = "symlink" }
 "~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
+"~/.config/mise/conf.d/go.toml"           = { source = "packages/go.toml", mode = "symlink" }
+"~/.config/mise/conf.d/kilo.toml"         = { source = "packages/kilo.toml", mode = "symlink" }
 "~/.config/mise/conf.d/microsandbox.toml" = { source = "packages/microsandbox.toml", mode = "symlink" }
 "~/.config/mise/conf.d/node.toml"         = { source = "packages/node.toml", mode = "symlink" }
 "~/.config/mise/conf.d/nono.toml"         = { source = "packages/nono.toml", mode = "symlink" }
@@ -59,19 +62,16 @@ npm.package_manager = "bun"
 "~/.config/mise/conf.d/pi.toml"           = { source = "packages/pi.toml", mode = "symlink" }
 "~/.config/mise/conf.d/pig.toml"          = { source = "packages/pig.toml", mode = "symlink" }
 "~/.config/mise/conf.d/rust.toml"         = { source = "packages/rust.toml", mode = "symlink" }
+"~/.config/mise/conf.d/sops.toml"         = { source = "packages/sops.toml", mode = "symlink" }
 "~/.config/mise/conf.d/uv.toml"           = { source = "packages/uv.toml", mode = "symlink" }
 
 # もう一方の役割（personal / work）だけで使うパッケージ。役割を切り替えたときに残らないよう消す
 "~/.config/mise/conf.d/agent-hop.toml"    = { mode = "absent" }
 "~/.config/mise/conf.d/agy.toml"          = { mode = "absent" }
-"~/.config/mise/conf.d/aube.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/cf.toml"           = { mode = "absent" }
 "~/.config/mise/conf.d/claude.toml"       = { mode = "absent" }
-"~/.config/mise/conf.d/go.toml"           = { mode = "absent" }
 "~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }
-"~/.config/mise/conf.d/kilo.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/pnpm.toml"         = { mode = "absent" }
-"~/.config/mise/conf.d/sops.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/strix.toml"        = { mode = "absent" }
 "~/.config/mise/conf.d/zig.toml"          = { mode = "absent" }
 "~/.config/mise/conf.d/zls.toml"          = { mode = "absent" }

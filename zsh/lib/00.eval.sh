@@ -2,6 +2,12 @@
 if [ -f "$HOME/.local/bin/mise" ] && [ -x "$HOME/.local/bin/mise" ]; then
   if [ -n "${ZSH_VERSION-}" ]; then
     eval "$("$HOME/.local/bin/mise" activate zsh)"
+    # mise activate は既存の mise() を unset して自前の関数を定義し直す。
+    # ローダは *.zsh → *.sh の順で読むため ghtkn トークンを渡すラッパー
+    # （functions/mise.zsh）だけでは activate に負ける。activate の後で読み直す
+    if [ -r "$HOME/.zsh/functions/mise.zsh" ]; then
+      source "$HOME/.zsh/functions/mise.zsh"
+    fi
   elif [ -n "${BASH_VERSION-}" ]; then
     eval "$("$HOME/.local/bin/mise" activate bash)"
   fi

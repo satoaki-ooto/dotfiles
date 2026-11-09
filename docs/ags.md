@@ -9,7 +9,7 @@ agent-sandbox（`ags` コマンド）。共通の方式は [agents.md](agents.md
 | `config.toml` | `merge = true` | 強制するキー（`[sandbox]` の image / パス類 / `passthrough_env` / `extra_dnf_packages`、`[[mount]]`、`[[agent_mount]]`、`[host_ui]` / `[clipboard]` / `[update]`） |
 | `config.defaults.toml` | `merge = "missing"` | 既定値だけ配るキー（`[sandbox].enabled_agents`。`ags tools` が書き換えるため） |
 
-- エントリは `config.personal.toml` 直書き（include には `[dotfiles]` を置けないため）
+- エントリは `config.personal.toml` / `config.work.toml` に直書き（`packages/` はツール定義だけを置く）
 - merge は配列を丸ごと置換する。`[[agent_mount]]` はリポジトリで所有するため
   `ags install --add-agent-mounts` は使わない（足すときは `agents/ags/config.toml` 側へ）
 - `ags tools` が書く `[[tool]]`、`tool-downloads.*.lock.json`、`agent-providers.*.lock.json` は管理しない

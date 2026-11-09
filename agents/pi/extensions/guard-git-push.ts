@@ -61,6 +61,7 @@ function checkSegment(segment: string, currentBranch: string | null): string | u
 	const positional: string[] = [];
 	let seenGit = false;
 	let seenPush = false;
+	let skipValue = false;
 
 	for (const word of words) {
 		if (!seenPush) {
@@ -69,10 +70,19 @@ function checkSegment(segment: string, currentBranch: string | null): string | u
 			continue;
 		}
 
+		if (skipValue) {
+			skipValue = false;
+			continue;
+		}
 		if (word === "--all" || word === "--mirror") {
 			return `git push ${word}`;
 		}
-		if (word.startsWith("-")) continue;
+		if (word.startsWith("-")) {
+			// `-o ci.skip` や `--repo origin` のように値を別の語で受け取るオプションは、
+			// 値を remote / refspec と誤認しないよう読み飛ばす。`--opt=value` 形式は 1 語で完結する。
+			if (!word.includes("=")) skipValue = true;
+			continue;
+		}
 		positional.push(word);
 	}
 

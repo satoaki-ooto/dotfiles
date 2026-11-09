@@ -1,6 +1,8 @@
 # claude（aqua:anthropics/claude-code）
 [tools."aqua:anthropics/claude-code"]
 version = "latest"
+# リリース間隔が短い（ほぼ毎日）ので age 制限を外す
+minimum_release_age = "0d"
 
 [env]
 DISABLE_AUTOUPDATER = "1"

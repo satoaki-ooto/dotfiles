@@ -1,6 +1,6 @@
 # go（PATH 追加もここに持たせる。include した端末だけ効く）
-# env_path はテーブルヘッダより前に書く（後ろだと tools.env_path 扱いになる）
-env_path = ["${HOME}/go/bin"]
+[env._]
+path = ["${HOME}/go/bin"]
 
 [tools]
 go = "latest"

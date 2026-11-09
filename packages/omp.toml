@@ -1,5 +1,6 @@
 # oh-my-pi（github:can1357/oh-my-pi）
 [tools."github:can1357/oh-my-pi"]
 version = "18.18.1"
+# version = "18.18.3"
 asset_pattern = 'omp-{{ os(macos="darwin") }}-{{ arch() }}'
 bin = "omp"

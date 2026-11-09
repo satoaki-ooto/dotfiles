@@ -50,6 +50,7 @@ npm.package_manager = "bun"
 "~/.config/mise/conf.d/ags.toml"          = { source = "packages/ags.toml", mode = "symlink" }
 "~/.config/mise/conf.d/aube.toml"         = { source = "packages/aube.toml", mode = "symlink" }
 "~/.config/mise/conf.d/bun.toml"          = { source = "packages/bun.toml", mode = "symlink" }
+"~/.config/mise/conf.d/claude.toml"       = { source = "packages/claude.toml", mode = "symlink" }
 "~/.config/mise/conf.d/command-code.toml" = { source = "packages/command-code.toml", mode = "symlink" }
 "~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
 "~/.config/mise/conf.d/go.toml"           = { source = "packages/go.toml", mode = "symlink" }
@@ -69,7 +70,6 @@ npm.package_manager = "bun"
 "~/.config/mise/conf.d/agent-hop.toml"    = { mode = "absent" }
 "~/.config/mise/conf.d/agy.toml"          = { mode = "absent" }
 "~/.config/mise/conf.d/cf.toml"           = { mode = "absent" }
-"~/.config/mise/conf.d/claude.toml"       = { mode = "absent" }
 "~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/pnpm.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/strix.toml"        = { mode = "absent" }

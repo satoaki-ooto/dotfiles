@@ -29,6 +29,8 @@
   もう一方の役割で使わないなら、そちらに `{ mode = "absent" }` を足す
 - 外す: エントリを `{ mode = "absent" }` に書き換える。エントリを消すだけだと配備済みの
   symlink が `conf.d/` に残り、読まれ続ける
+- バージョン更新: `version` を書き換える。旧バージョンをコメントアウトで残さない
+  （履歴・差分は git が持つ）。反映は `mise install`
 - 反映: `mise dot apply` で `conf.d/` の symlink を作り直し、追加したパッケージは続けて
   `mise install` でインストールする（`mise bootstrap` なら両方を行う）。
   `mise dot apply` だけではツールはインストールされず、config を書き換えただけでは symlink も変わらない

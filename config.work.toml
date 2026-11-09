@@ -5,26 +5,14 @@
 # 書いてよいかは別途判断すること（ダメならリポジトリを private にするか、
 # config.work.local.toml に書いて追跡対象外にする）
 #
-# パッケージは packages/ の定義を include して初めて有効になる
-# （自動では読まれない）。使うものだけ明示する。
-include = [
-  "packages/ags.toml",
-  "packages/bun.toml",
-  "packages/command-code.toml",
-  "packages/gh.toml",
-  "packages/microsandbox.toml",
-  "packages/node.toml",
-  "packages/nono.toml",
-  "packages/octet.toml",
-  "packages/omp.toml",
-  "packages/pi.toml",
-  "packages/pig.toml",
-  "packages/rust.toml",
-  "packages/uv.toml",
-]
+# パッケージは packages/ の定義を末尾の [dotfiles] で ~/.config/mise/conf.d/ に
+# symlink して初めて有効になる（自動では読まれない）。使うものだけ明示する。
 
 [settings]
-# paranoid の config カテゴリは local include を拒否するため外している。
+# paranoid の config カテゴリは外している（パッケージは conf.d/ 方式に移行済みで、
+# 有効にしても dotfiles は読める）。有効にするとリポジトリ側の mise 設定が内容単位の
+# 承認（mise trust）になり、pull / worktree のたびに止まりうるため、影響を確認してから入れる。
+# miserc.local.toml の env で後ろに重ねた設定が paranoid = true を指定すれば、そちらが優先される。
 # true は全カテゴリ（config / env_files / plugins / provenance）の指定と同じ。
 # provenance（GitHub attestations / SLSA）と plugins / env_files は維持。
 paranoid = ["env_files", "plugins", "provenance"]
@@ -50,3 +38,40 @@ npm.package_manager = "bun"
 # アセット（Containerfile / image/ / tmux.conf / uv.toml / pi/）は ags install が配るので管理しない
 "~/.config/ags/config.toml/core"     = { source = "agents/ags/config.toml", merge = true }
 "~/.config/ags/config.toml/defaults" = { source = "agents/ags/config.defaults.toml", merge = "missing" }
+
+# ---------------------------------------------------------------
+# パッケージ（packages/<name>.toml を ~/.config/mise/conf.d/ に symlink する）
+# この一覧が「この端末で使うもの」。conf.d/ は global config として読まれるので、
+# paranoid の config カテゴリでも承認なしで読まれる（local include は拒否される）。
+# 追加: エントリを足して mise dot apply。外す: source を消して mode = "absent" にする
+# （エントリを消すだけだと配備済みの symlink が残り、読まれ続ける）
+# ---------------------------------------------------------------
+"~/.config/mise/conf.d/ags.toml"          = { source = "packages/ags.toml", mode = "symlink" }
+"~/.config/mise/conf.d/bun.toml"          = { source = "packages/bun.toml", mode = "symlink" }
+"~/.config/mise/conf.d/command-code.toml" = { source = "packages/command-code.toml", mode = "symlink" }
+"~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
+"~/.config/mise/conf.d/microsandbox.toml" = { source = "packages/microsandbox.toml", mode = "symlink" }
+"~/.config/mise/conf.d/node.toml"         = { source = "packages/node.toml", mode = "symlink" }
+"~/.config/mise/conf.d/nono.toml"         = { source = "packages/nono.toml", mode = "symlink" }
+"~/.config/mise/conf.d/octet.toml"        = { source = "packages/octet.toml", mode = "symlink" }
+"~/.config/mise/conf.d/omp.toml"          = { source = "packages/omp.toml", mode = "symlink" }
+"~/.config/mise/conf.d/pi.toml"           = { source = "packages/pi.toml", mode = "symlink" }
+"~/.config/mise/conf.d/pig.toml"          = { source = "packages/pig.toml", mode = "symlink" }
+"~/.config/mise/conf.d/rust.toml"         = { source = "packages/rust.toml", mode = "symlink" }
+"~/.config/mise/conf.d/uv.toml"           = { source = "packages/uv.toml", mode = "symlink" }
+
+# もう一方の役割（personal / work）だけで使うパッケージ。役割を切り替えたときに残らないよう消す
+"~/.config/mise/conf.d/agent-hop.toml"    = { mode = "absent" }
+"~/.config/mise/conf.d/agy.toml"          = { mode = "absent" }
+"~/.config/mise/conf.d/aube.toml"         = { mode = "absent" }
+"~/.config/mise/conf.d/cf.toml"           = { mode = "absent" }
+"~/.config/mise/conf.d/claude.toml"       = { mode = "absent" }
+"~/.config/mise/conf.d/go.toml"           = { mode = "absent" }
+"~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }
+"~/.config/mise/conf.d/kilo.toml"         = { mode = "absent" }
+"~/.config/mise/conf.d/pnpm.toml"         = { mode = "absent" }
+"~/.config/mise/conf.d/sops.toml"         = { mode = "absent" }
+"~/.config/mise/conf.d/strix.toml"        = { mode = "absent" }
+"~/.config/mise/conf.d/zig.toml"          = { mode = "absent" }
+"~/.config/mise/conf.d/zls.toml"          = { mode = "absent" }
+"~/.config/mise/conf.d/zro.toml"          = { mode = "absent" }

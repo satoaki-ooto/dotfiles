@@ -2,3 +2,6 @@ miserc.local.toml
 *.local.toml
 *.local.sh
 *.local.zsh
+
+# packages/ から symlink で配るもの。端末（役割）ごとに中身が違うので追跡しない
+conf.d/

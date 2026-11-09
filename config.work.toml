@@ -39,6 +39,13 @@ npm.package_manager = "bun"
 "~/.config/ags/config.toml/core"     = { source = "agents/ags/config.toml", merge = true }
 "~/.config/ags/config.toml/defaults" = { source = "agents/ags/config.defaults.toml", merge = "missing" }
 
+# kilo。kilo 自身も /models などで kilo.jsonc を書き換える（jsonc を in-place
+# patch するので未管理キー・コメントは保たれる）ため merge で管理する。
+# セッション agent のモデル（ask / plan / code / debug）は /models で
+# 書き換わるので defaults。それ以外は kilo.jsonc（core）で強制する。
+"~/.config/kilo/kilo.jsonc/core"     = { source = "agents/kilo/kilo.jsonc", merge = true }
+"~/.config/kilo/kilo.jsonc/defaults" = { source = "agents/kilo/kilo.defaults.jsonc", merge = "missing" }
+
 # ---------------------------------------------------------------
 # パッケージ（packages/<name>.toml を ~/.config/mise/conf.d/ に symlink する）
 # この一覧が「この端末で使うもの」。conf.d/ は global config として読まれるので、

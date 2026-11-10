@@ -8,10 +8,12 @@ _configure_ssh_agent() {
     esac
 
     local _os _sock
+    local -a _socks
     _os="$(uname -s)"
     case "$_os" in
         Darwin)
-            set -- "$HOME/.bitwarden-ssh-agent.sock" "$HOME"/.keeper/*.ssh_agent(N)
+            _socks+=("$HOME/.bitwarden-ssh-agent.sock")
+            _socks+=("$HOME/Library/Containers/com.callpod.keepermac.lite/Data/tmp/keeper-ssh-agent.sock")
             ;;
         Linux)
             local _id
@@ -26,18 +28,18 @@ _configure_ssh_agent() {
             )"
             # Ubuntu は Snap 優先、それ以外の Linux は Flatpak 優先とする
             if [ "$_id" = "ubuntu" ]; then
-                set -- "$HOME/snap/keepersecurity/current/.config/Keeper Password Manager/keeper-ssh-agent.sock" \
-                    "$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock" \
-                    "$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
+                _socks+=("$HOME/snap/keepersecurity/current/.config/Keeper Password Manager/keeper-ssh-agent.sock")
+                _socks+=("$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock")
+                _socks+=("$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock")
             else
-                set -- "$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock" \
-                    "$HOME/snap/keepersecurity/current/.config/Keeper Password Manager/keeper-ssh-agent.sock" \
-                    "$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock"
+                _socks+=("$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock")
+                _socks+=("$HOME/snap/keepersecurity/current/.config/Keeper Password Manager/keeper-ssh-agent.sock")
+                _socks+=("$HOME/snap/bitwarden/current/.bitwarden-ssh-agent.sock")
             fi
             ;;
     esac
 
-    for _sock in "$@"; do
+    for _sock in "${_socks[@]}"; do
         if [ -S "$_sock" ]; then
             export SSH_AUTH_SOCK="$_sock"
             return

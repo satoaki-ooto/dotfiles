@@ -48,15 +48,15 @@
 # 各エージェントから参照する（AGENTS.md は「全エージェントで共通」という位置づけ）
 # ---------------------------------------------------------------
 
-# pi: ~/.pi/agent。pig: ~/.config/pig/agent（PIG_HOME で固定。docs/config.md 参照）
+# pi: ~/.pi/agent。pig: OS ごとの root（macOS: ~/.pig、Linux: ~/.config/pig）。
+# pig の dotfiles は config.macos.toml / config.linux.toml で宣言する（auto_env で
+# 自動読み込み。詳細は docs/pig.md）
 # アプリが書き換える settings.json は merge で「自分のキー」だけ管理する:
 #   - core: 強制するキー（リポジトリが唯一の情報源。pi install したものは
 #     ここに書いてから bootstrap すると全機械に反映される）
 #   - defaults: 既定値だけ配るキー（/model で選んだ値はアプリの所有物。無いときだけ埋める）
 "~/.pi/agent/settings.json/core"          = { source = "agents/pi/settings.json.tera", merge = true, template = "tera" }
 "~/.pi/agent/settings.json/defaults"      = { source = "agents/pi/settings.defaults.json", merge = "missing" }
-"~/.config/pig/agent/settings.json/core"     = { source = "agents/pig/settings.json", merge = true }
-"~/.config/pig/agent/settings.json/defaults" = { source = "agents/pig/settings.defaults.json", merge = "missing" }
 "~/.omp/agent/config.yml/core"            = { source = "agents/omp/config.yml", merge = true }
 "~/.omp/agent/config.yml/defaults"        = { source = "agents/omp/config.defaults.yml", merge = "missing" }
 
@@ -69,9 +69,6 @@
 "~/.pi/agent/rules"                = { source = "agents/shared/rules", mode = "copy" }
 # ~/.pi/agent/extensions/ は拡張の自動検出対象。settings.json への追記は不要
 "~/.pi/agent/extensions/guard-git-push.ts" = { source = "agents/pi/extensions/guard-git-push.ts", mode = "copy" }
-"~/.config/pig/agent/models.json"  = { source = "agents/pig/models.json", mode = "copy" }
-"~/.config/pig/agent/AGENTS.md"    = { source = "agents/shared/AGENTS.md", mode = "copy" }
-"~/.config/pig/agent/rules"        = { source = "agents/shared/rules", mode = "copy" }
 "~/.omp/agent/models.yml"          = { source = "agents/omp/models.yml", mode = "copy" }
 "~/.omp/agent/AGENTS.md"           = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.omp/agent/rules"               = { source = "agents/shared/rules", mode = "copy" }
@@ -80,10 +77,6 @@
 # AGENTS.md と rules だけ copy する。
 "~/.octet/AGENTS.md" = { source = "agents/shared/AGENTS.md", mode = "copy" }
 "~/.octet/rules"     = { source = "agents/shared/rules", mode = "copy" }
-
-# pig は models.json だけを読む（models.jsonc は未参照のため無効）。
-# models.jsonc は誤認のもとになるので配備時に消す（内容は agents/pig/models.json に移行済み）
-"~/.config/pig/agent/models.jsonc" = { mode = "absent" }
 
 # ---------------------------------------------------------------
 # シェルへの mise 組み込み

@@ -23,9 +23,7 @@ OPENSPEC_TELEMETRY = "0"
 # aube の typosquat ガード（週 1000 DL 未満は non-interactive で拒否）から
 # agent-hop だけ除外する。cf / zro など他のパッケージにはガードを効かせたままにする
 AUBE_ALLOWED_UNPOPULAR_PACKAGES = "agent-hop"
-# pig の設定 root を固定する。pig は PIG_HOME > XDG_CONFIG_HOME > ~/.pig の順で決めるため、
-# XDG_CONFIG_HOME が無い環境（sandbox 等）でも ~/.config/pig を見に行く
-PIG_HOME = "${HOME}/.config/pig"
+# PIG_HOME は config.macos.toml / config.linux.toml で OS ごとに固定する（docs/pig.md 参照）
 
 # ---------------------------------------------------------------
 # 役割別 zsh 断片（~/.zsh.personal として deploy。ローダが ~/.zsh.* を拾う）

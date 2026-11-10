@@ -1,0 +1,7 @@
+# 起動設定。config.toml が読まれる前に mise 自身が読む。
+#
+# OS / arch ごとの config ファイル（config.macos.toml / config.linux.toml 等）を
+# 現在の OS に合わせて自動的に読む。config discovery を制御する設定のため
+# config.toml / config.*.toml には書けず、miserc 系でしか効かない。
+# 現在は opt-in（mise 2027.6.0 からデフォルト ON の予定。明示しておくと移行警告も出ない）
+auto_env = true

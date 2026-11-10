@@ -26,6 +26,7 @@
 | [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
 | [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [octet.md](docs/octet.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
 | [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
+| [github.md](docs/github.md) | GitHub repo 設定（main の保護 ruleset と履歴改変時の解除手順） |
 
 ## 新しい端末のセットアップ
 
@@ -178,7 +179,7 @@ git push
 
 ### copy で配備した target を編集した場合
 
-copy 対象は `config.toml` の `mode = "copy"` で宣言されている。
+copy 対象は `config.toml` と OS 別の `config.macos.toml` / `config.linux.toml` の `mode = "copy"` で宣言されている。
 
 | 配備先 target | repo 内の source |
 |---|---|
@@ -186,9 +187,9 @@ copy 対象は `config.toml` の `mode = "copy"` で宣言されている。
 | `~/.pi/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
 | `~/.pi/agent/rules/` | `agents/shared/rules/` |
 | `~/.pi/agent/extensions/guard-git-push.ts` | `agents/pi/extensions/guard-git-push.ts` |
-| `~/.config/pig/agent/models.json` | `agents/pig/models.json` |
-| `~/.config/pig/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
-| `~/.config/pig/agent/rules/` | `agents/shared/rules/` |
+| `~/.pig/agent/models.json`（macOS）/ `~/.config/pig/agent/models.json`（Linux） | `agents/pig/models.json` |
+| `~/.pig/agent/AGENTS.md`（macOS）/ `~/.config/pig/agent/AGENTS.md`（Linux） | `agents/shared/AGENTS.md` |
+| `~/.pig/agent/rules/`（macOS）/ `~/.config/pig/agent/rules/`（Linux） | `agents/shared/rules/` |
 | `~/.omp/agent/models.yml` | `agents/omp/models.yml` |
 | `~/.omp/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
 | `~/.omp/agent/rules/` | `agents/shared/rules/` |

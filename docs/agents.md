@@ -8,7 +8,7 @@
 `~/.config/mise` が見えず設定を読めないため。
 
 - [pi](pi.md)（`agents/pi/` → `~/.pi/agent/`）
-- [pig](pig.md)（`agents/pig/` → `~/.config/pig/agent/`）
+- [pig](pig.md)（`agents/pig/` → OS ごとの root。macOS: `~/.pig/agent`、Linux: `~/.config/pig/agent`）
 - [omp](omp.md)（`agents/omp/` → `~/.omp/agent/`）
 - [octet](octet.md)（`agents/shared/` → `~/.octet/`）
 - [kilo](kilo.md)（`agents/kilo/` → `~/.config/kilo/kilo.jsonc`）

@@ -14,7 +14,7 @@ pi と同じ方式（詳細は [pi.md](pi.md)）。共通の方式は [agents.md
   配備先と pig の読み先を確実に一致させるため、`config.macos.toml` / `config.linux.toml` の
   `[env]` で OS ごとに `PIG_HOME` を固定し、同じファイルの `[dotfiles]` がその配下に
   配備する（macOS: `~/.pig/agent`、Linux: `~/.config/pig/agent`。中身は OS 間で共通）。
-  `XDG_CONFIG_HOME` を設定するとそちらが優先されるので注意
+  `XDG_CONFIG_HOME` より `PIG_HOME` が優先されるため、上記で固定した root が使われる
 - 旧来 `~/.config/pig` に配備していた macOS 端末の移行: この変更を取り込んだ後
   `mise dot apply`（または `mise bootstrap`）で `~/.pig` 側へ配備し直す。
   pig の sessions / auth / trust は配置対象外なので、引き継ぐなら手動で移す。

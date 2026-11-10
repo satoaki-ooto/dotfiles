@@ -15,6 +15,10 @@ pi と同じ方式（詳細は [pi.md](pi.md)）。共通の方式は [agents.md
   `[env]` で OS ごとに `PIG_HOME` を固定し、同じファイルの `[dotfiles]` がその配下に
   配備する（macOS: `~/.pig/agent`、Linux: `~/.config/pig/agent`。中身は OS 間で共通）。
   `XDG_CONFIG_HOME` を設定するとそちらが優先されるので注意
+- 旧来 `~/.config/pig` に配備していた macOS 端末の移行: この変更を取り込んだ後
+  `mise dot apply`（または `mise bootstrap`）で `~/.pig` 側へ配備し直す。
+  pig の sessions / auth / trust は配置対象外なので、引き継ぐなら手動で移す。
+  旧 `~/.config/pig` は mise の管理外に残るため、不要になったら手動で削除する
 - pig は `models.json` だけを読み、`models.jsonc` は参照しない。
   手元に `models.jsonc` が残っていても無効（各 OS ファイルの `absent` で消している）。
   「pig が provider を見つけられない」原因はほぼこれ

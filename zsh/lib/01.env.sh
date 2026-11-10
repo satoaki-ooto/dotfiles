@@ -1,9 +1,9 @@
 # set SSH_AUTH_SOCK
 _configure_ssh_agent() {
     # SSH 転送や macOS launchd など、既に有効なソケットを指している場合はそのままにする
-    # ただし gcr-agent (GNOME) は Keeper/Bitwarden を優先したいので対象外
+    # ただし gcr-agent (GNOME) と herdr の agent ソケットは Keeper/Bitwarden を優先したいので対象外
     case "${SSH_AUTH_SOCK:-}" in
-        ""|*/gcr/ssh) ;;
+        ""|*/gcr/ssh|*/herdr.sock.agent) ;;
         *) [ -S "$SSH_AUTH_SOCK" ] && return ;;
     esac
 
@@ -11,7 +11,7 @@ _configure_ssh_agent() {
     _os="$(uname -s)"
     case "$_os" in
         Darwin)
-            set -- "$HOME/.bitwarden-ssh-agent.sock"
+            set -- "$HOME/.bitwarden-ssh-agent.sock" "$HOME"/.keeper/*.ssh_agent(N)
             ;;
         Linux)
             local _id

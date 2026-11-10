@@ -186,9 +186,9 @@ copy 対象は `config.toml` の `mode = "copy"` で宣言されている。
 | `~/.pi/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
 | `~/.pi/agent/rules/` | `agents/shared/rules/` |
 | `~/.pi/agent/extensions/guard-git-push.ts` | `agents/pi/extensions/guard-git-push.ts` |
-| `~/.config/pig/agent/models.json` | `agents/pig/models.json` |
-| `~/.config/pig/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
-| `~/.config/pig/agent/rules/` | `agents/shared/rules/` |
+| `~/.pig/agent/models.json`（macOS）/ `~/.config/pig/agent/models.json`（Linux） | `agents/pig/models.json` |
+| `~/.pig/agent/AGENTS.md`（macOS）/ `~/.config/pig/agent/AGENTS.md`（Linux） | `agents/shared/AGENTS.md` |
+| `~/.pig/agent/rules/`（macOS）/ `~/.config/pig/agent/rules/`（Linux） | `agents/shared/rules/` |
 | `~/.omp/agent/models.yml` | `agents/omp/models.yml` |
 | `~/.omp/agent/AGENTS.md` | `agents/shared/AGENTS.md` |
 | `~/.omp/agent/rules/` | `agents/shared/rules/` |

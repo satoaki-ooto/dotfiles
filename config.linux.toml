@@ -1,0 +1,26 @@
+# Linux 向けの差分（miserc.toml の auto_env で OS を判定して自動的に読まれる。
+# env = ["personal"] / ["work"] の役割選択とは独立。役割別の差分は
+# config.personal.toml / config.work.toml）
+#
+# pig の設定 root は pig が PIG_HOME > XDG_CONFIG_HOME > ~/.pig の順で決める（docs/pig.md）。
+# 配備先と pig の読み先を確実に一致させるため [env] で OS ごとの root を固定する。
+# 中身は OS 間で共通（agents/pig/ を共有）。config.macos.toml と対で管理すること
+
+[env]
+PIG_HOME = "${HOME}/.config/pig"
+
+[dotfiles]
+# アプリが書き換える settings.json は merge で「自分のキー」だけ管理する
+# （core / defaults の役割分担は config.toml の pi のコメントと docs/pig.md 参照）
+"~/.config/pig/agent/settings.json/core"     = { source = "agents/pig/settings.json", merge = true }
+"~/.config/pig/agent/settings.json/defaults" = { source = "agents/pig/settings.defaults.json", merge = "missing" }
+
+# アプリが書き換えないものは copy（実ファイル）。
+# 編集は agents/ 側で行い mise dot apply で反映する（ターゲット側を編集すると上書きされる）
+"~/.config/pig/agent/models.json" = { source = "agents/pig/models.json", mode = "copy" }
+"~/.config/pig/agent/AGENTS.md"   = { source = "agents/shared/AGENTS.md", mode = "copy" }
+"~/.config/pig/agent/rules"       = { source = "agents/shared/rules", mode = "copy" }
+
+# pig は models.json だけを読む（models.jsonc は未参照のため無効）。
+# models.jsonc は誤認のもとになるので配備時に消す（内容は agents/pig/models.json に移行済み）
+"~/.config/pig/agent/models.jsonc" = { mode = "absent" }

@@ -5,6 +5,8 @@
 | `config.toml` | 全端末共通（tools / packages / prezto clone / dotfiles 宣言） |
 | `config.personal.toml` | 自宅PC向け（`env = ["personal"]` で読み込まれる） |
 | `config.work.toml` | 会社PC向け（`env = ["work"]` で読み込まれる） |
+| `config.macos.toml` / `config.linux.toml` | OS 別の差分。`miserc.toml` の `auto_env` で OS を判定して自動読み込み（役割選択と独立）。pig は OS で設定 root が違うため target をここで変える |
+| `miserc.toml` | mise の起動設定（`auto_env`）。config の読み込み制御のため config.toml 側には書けない |
 | `packages/` | 1 パッケージ 1 ファイルのツール定義。役割別 config の `[dotfiles]` で `conf.d/` に symlink したものだけが読まれる |
 | `conf.d/` | 選んだパッケージの symlink 置き場（gitignored。global config として読まれる） |
 | `miserc.local.toml` | 端末ごとの役割選択（gitignored、同期されない） |

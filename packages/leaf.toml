@@ -1,0 +1,5 @@
+# leaf（github:RivoLink/leaf）
+[tools."github:RivoLink/leaf"]
+version = "1.29.2"
+asset_pattern = 'leaf-{{ os(macos="macos", linux="linux") }}-{{ arch(x64="x86_64", arm64="arm64") }}'
+bin = "leaf"

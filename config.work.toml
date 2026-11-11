@@ -62,6 +62,7 @@ npm.package_manager = "bun"
 "~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
 "~/.config/mise/conf.d/go.toml"           = { source = "packages/go.toml", mode = "symlink" }
 "~/.config/mise/conf.d/kilo.toml"         = { source = "packages/kilo.toml", mode = "symlink" }
+"~/.config/mise/conf.d/leaf.toml"         = { source = "packages/leaf.toml", mode = "symlink" }
 "~/.config/mise/conf.d/microsandbox.toml" = { source = "packages/microsandbox.toml", mode = "symlink" }
 "~/.config/mise/conf.d/node.toml"         = { source = "packages/node.toml", mode = "symlink" }
 "~/.config/mise/conf.d/nono.toml"         = { source = "packages/nono.toml", mode = "symlink" }

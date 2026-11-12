@@ -90,11 +90,28 @@ function ghtkn_agent_ensure() {
   [[ "$locked" == false ]]
 }
 
-# app のトークンが GHTKN_MIN_EXPIRATION 以上有効か確認し、無ければその場で ghtkn auth する
-# 確認は ghtkn exec で行い、トークンをシェルに取り出さない（exit 111 = 取得不可）
+# app のトークンが GHTKN_MIN_EXPIRATION 以上有効かを終了コードで返す
+#   0   = 有効
+#   111 = 取得できない（期限切れ・未認証。ghtkn exec の仕様）
+#   他  = ghtkn 自体のエラー（設定や引数の誤りなど）。原因が分かるよう stderr を表示する
+# 確認は ghtkn exec で行い、トークンをシェルに取り出さない
+function __ghtkn_token_check() {
+  local app=$1 err rc
+  err="$(ghtkn exec -e "__GHTKN_CHECK:$app" -m "$GHTKN_MIN_EXPIRATION" -- true 2>&1 >/dev/null)"
+  rc=$?
+  (( rc == 0 || rc == 111 )) || print -u2 -r -- "$err"
+  return rc
+}
+
+# app のトークンが有効か確認し、期限切れ・未認証（111）のときだけその場で ghtkn auth する
 function ghtkn_token_ensure() {
-  local app=$1
-  ghtkn exec -e "__GHTKN_CHECK:$app" -m "$GHTKN_MIN_EXPIRATION" -- true 2>/dev/null && return 0
+  local app=$1 rc
+  __ghtkn_token_check "$app"; rc=$?
+  (( rc == 0 )) && return 0
+  if (( rc != 111 )); then
+    print -u2 "failed to check the $app token (ghtkn exec exited with $rc)"
+    return rc
+  fi
 
   if ! __ghtkn_has_tty; then
     print -u2 "$app token is expired or missing and no terminal is available for the device flow; ask the user to run in their terminal: ghtkn auth $app"
@@ -108,7 +125,9 @@ function ghtkn_token_ensure() {
     print -r "hint: refresh tokens are disabled; to skip this next time run: ghtkn agent lock && ghtkn agent unlock --enable-refresh" >/dev/tty
   fi
   ghtkn auth "$app" </dev/tty >/dev/tty 2>&1 || return 1
-  ghtkn exec -e "__GHTKN_CHECK:$app" -m "$GHTKN_MIN_EXPIRATION" -- true 2>/dev/null
+  __ghtkn_token_check "$app"; rc=$?
+  (( rc == 111 )) && print -u2 "$app token is still unavailable after ghtkn auth"
+  return rc
 }
 
 # 使う App 名を出力する。アプリ名はリポジトリに載せないため GHTKN_APP（例: <org>/write）で渡す
@@ -140,8 +159,10 @@ function ghtkn_ready() {
 }
 
 # 例: token="$(ghtkn_token "$GHTKN_APP")" || return
+# 残り期限は ghtkn_ready で確認済みなので、ここで -m を付けて二重に判定しない
+# （閾値ちょうどで切れると再認証せずに失敗するため）
 function ghtkn_token() {
   local app=${1:-$(ghtkn_app)}
   ghtkn_ready "$app" || return
-  ghtkn get -m "$GHTKN_MIN_EXPIRATION" "$app"
+  ghtkn get "$app"
 }

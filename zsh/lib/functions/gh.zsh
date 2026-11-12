@@ -9,6 +9,15 @@ function gh() {
     return
   fi
 
+  # トークンを使わないサブコマンドは ghtkn を通さない。
+  # トークンが期限切れで端末も無い（coding agent 等）ときに --version や help まで失敗しないように
+  case "${1-}" in
+    (''|-h|--help|help|--version|version|completion)
+      command gh "$@"
+      return
+      ;;
+  esac
+
   # gh.zsh だけが読まれた場合（古い shell snapshot 等）でも動くよう、必要なら ghtkn.zsh を読む
   if (( ! $+functions[ghtkn_ready] )); then
     source "$HOME/.zsh/functions/ghtkn.zsh" || return

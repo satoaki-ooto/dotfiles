@@ -15,6 +15,14 @@ function mise() {
     return
   fi
 
+  # トークンを使わないサブコマンドは ghtkn を通さない（gh.zsh と同じ理由）
+  case "${1-}" in
+    (''|-h|--help|help|-V|--version|version|completion)
+      __mise_dispatch "$@"
+      return
+      ;;
+  esac
+
   local token
   token="$(ghtkn_token "$GHTKN_APP")" || return
   local -x MISE_GITHUB_TOKEN="$token"

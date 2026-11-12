@@ -1,59 +1,168 @@
-function ghtkn_agent_is_running() {
-  local agent_status_output
-  agent_status_output="$(ghtkn agent status 2>&1)"
-  [[ "$agent_status_output" == *"ghtkn agent is running"* ]]
+# ghtkn (agent backend) からトークンを取り出すための共通関数
+#
+# 想定する壊れ方と対処:
+#   - 再起動後: agent が居ない（socket ファイルだけ残る）→ start して unlock
+#   - 起動済みだがロック中（unlock の中断・ghtkn agent lock 等）→ unlock
+#   - トークン期限切れ（refresh 無効時は約 8h）→ ghtkn auth（device flow）
+# ghtkn v0.4 以降は get / exec が device flow を始めないため、ここで先回りして直す。
+# unlock (passphrase 入力) と auth (device flow) は制御端末 /dev/tty で自動実行する。
+# stdin/stdout/stderr がパイプ・リダイレクト・$(...) でも、端末さえあれば動く。
+# 制御端末が無い (cron・launchd・エディタ/エージェントの子プロセス等) ときだけ失敗する。
+
+# トークン取得前に要求する残り有効期限
+: ${GHTKN_MIN_EXPIRATION:=5m}
+
+# 制御端末を開けるか（passphrase 入力や device flow ができるか）
+function __ghtkn_has_tty() {
+  { : </dev/tty } 2>/dev/null
 }
 
-# ghtkn_token は $(...) 内で呼ばれるので、unlock の出力がトークンに混ざらないよう stderr へ逃がす
+# agent の状態を "running locked refresh" の形で出力する（例: "true false true"）
+# ghtkn info / agent status はトークンを含まないので安全に状態確認に使える。
+# 状態が取れなかったときは何も出力せず失敗する（呼び出し側は fail closed で扱う）
+function __ghtkn_agent_state() {
+  setopt localoptions pipefail extendedglob
+  local state
+  if (( $+commands[jq] )); then
+    # jq の // は false も「値なし」扱いするので、キーの有無で既定値を決める
+    state="$(ghtkn info 2>/dev/null | jq -er '
+      .agent // {}
+      | [ .running == true,
+          (if has("locked") then .locked else true end),
+          .refresh_token.enabled == true ]
+      | map(tostring) | join(" ")' 2>/dev/null)" || return 1
+  else
+    # jq が無い環境では ghtkn agent status のログ文言で判定する
+    local out refresh=false
+    out="$(ghtkn agent status 2>&1)" || return 1
+    out="${out//$'\e'\[[0-9;]#m/}"
+    [[ "$out" == *"refresh_token_enabled=true"* ]] && refresh=true
+    case "$out" in
+      (*"agent is not running"*) state="false true false" ;;
+      (*"running and unlocked"*) state="true false $refresh" ;;
+      (*"running but locked"*)   state="true true false" ;;
+      (*) return 1 ;;
+    esac
+  fi
+  [[ "$state" == (true|false)" "(true|false)" "(true|false) ]] || return 1
+  print -r -- "$state"
+}
+
 function ghtkn_agent_unlock() {
-  ghtkn agent unlock --enable-refresh --refresh-token-ttl 2d >&2
+  if ! __ghtkn_has_tty; then
+    print -u2 "ghtkn agent is locked and no terminal is available to enter the passphrase; ask the user to run in their terminal: ghtkn agent unlock --enable-refresh"
+    return 1
+  fi
+  print -r "ghtkn agent is locked; unlocking" >/dev/tty
+  ghtkn agent unlock --enable-refresh --refresh-token-ttl 2d </dev/tty >/dev/tty 2>&1
 }
 
+# agent を「起動済み・アンロック済み」にする
 function ghtkn_agent_ensure() {
-  ghtkn_agent_is_running && return 0
+  local state running locked refresh
+  if ! state="$(__ghtkn_agent_state)"; then
+    print -u2 "failed to query the ghtkn agent state (ghtkn info)"
+    return 1
+  fi
+  read -r running locked refresh <<<"$state"
 
-  ghtkn agent start </dev/null >/dev/null 2>&1 &!
-
-  local i
-  for i in {1..50}; do
-    if ghtkn_agent_is_running; then
-      ghtkn_agent_unlock
-      return 0
+  if [[ "$running" != true ]]; then
+    # 古い socket ファイルが残っていても ghtkn agent start が置き換える
+    ghtkn agent start </dev/null >/dev/null 2>&1 &!
+    local i
+    for i in {1..50}; do
+      state="$(__ghtkn_agent_state)" && read -r running locked refresh <<<"$state"
+      [[ "$running" == true ]] && break
+      sleep 0.1
+    done
+    if [[ "$running" != true ]]; then
+      print -u2 "failed to start ghtkn agent"
+      return 1
     fi
-    sleep 0.1
-  done
+  fi
 
-  print -u2 "failed to start ghtkn agent"
-  return 1
+  [[ "$locked" == true ]] || return 0
+  ghtkn_agent_unlock || return 1
+
+  # 状態が取れない場合も含め、アンロックを確認できたときだけ成功にする
+  state="$(__ghtkn_agent_state)" || return 1
+  read -r running locked refresh <<<"$state"
+  [[ "$locked" == false ]]
 }
 
-# ghtkn から秘密情報を取得する。ロックされていれば unlock して 1 回だけ再試行する
-function ghtkn_get_token() {
-  local secret=$1
-  ghtkn get "$secret" 2>/dev/null && return 0
-
-  ghtkn_agent_unlock
-  ghtkn get "$secret" 2>/dev/null && return 0
-
-  # Device Flow は対話が必要なので、端末から呼ばれたときだけ自動で ghtkn auth する
-  [[ -t 0 && -t 2 ]] || return 1
-  ghtkn auth "$secret" >&2 || return 1
-  ghtkn get "$secret"
+# app のトークンが GHTKN_MIN_EXPIRATION 以上有効かを終了コードで返す
+#   0   = 有効
+#   111 = 取得できない（期限切れ・未認証。ghtkn exec の仕様）
+#   他  = ghtkn 自体のエラー（設定や引数の誤りなど）。原因が分かるよう stderr を表示する
+# 確認は ghtkn exec で行い、トークンをシェルに取り出さない
+function __ghtkn_token_check() {
+  local app=$1 err rc
+  err="$(ghtkn exec -e "__GHTKN_CHECK:$app" -m "$GHTKN_MIN_EXPIRATION" -- true 2>&1 >/dev/null)"
+  rc=$?
+  (( rc == 0 || rc == 111 )) || print -u2 -r -- "$err"
+  return rc
 }
 
-# agent の起動からトークン取得までをまとめた入口。各アプリのラッパーからはこれを呼ぶ
-# アプリ名はリポジトリに載せないため GHTKN_APP（例: <org>/write）で渡す
-# 例: token="$(ghtkn_token "$GHTKN_APP")" || return
-function ghtkn_token() {
-  local app=$1
+# app のトークンが有効か確認し、期限切れ・未認証（111）のときだけその場で ghtkn auth する
+function ghtkn_token_ensure() {
+  local app=$1 rc
+  __ghtkn_token_check "$app"; rc=$?
+  (( rc == 0 )) && return 0
+  if (( rc != 111 )); then
+    print -u2 "failed to check the $app token (ghtkn exec exited with $rc)"
+    return rc
+  fi
+
+  if ! __ghtkn_has_tty; then
+    print -u2 "$app token is expired or missing and no terminal is available for the device flow; ask the user to run in their terminal: ghtkn auth $app"
+    return 1
+  fi
+
+  print -r "$app token is expired or missing; starting ghtkn auth" >/dev/tty
+  local state running locked refresh
+  state="$(__ghtkn_agent_state)" && read -r running locked refresh <<<"$state"
+  if [[ "$refresh" == false ]]; then
+    print -r "hint: refresh tokens are disabled; to skip this next time run: ghtkn agent lock && ghtkn agent unlock --enable-refresh" >/dev/tty
+  fi
+  ghtkn auth "$app" </dev/tty >/dev/tty 2>&1 || return 1
+  __ghtkn_token_check "$app"; rc=$?
+  (( rc == 111 )) && print -u2 "$app token is still unavailable after ghtkn auth"
+  return rc
+}
+
+# 使う App 名を出力する。アプリ名はリポジトリに載せないため GHTKN_APP（例: <org>/write）で渡す
+# GHTKN_APP は config.local.toml の [env] にあり mise activate (対話シェル) で入るので、
+# coding agent の非対話シェル等で未設定なら mise env から補う。
+# jq に依存しないよう、mise env の出力をサブシェルで評価して取り出す
+function ghtkn_app() {
+  if [[ -n "${GHTKN_APP:-}" ]]; then
+    print -r -- "$GHTKN_APP"
+    return
+  fi
+  local app env_script
+  env_script="$(command mise env -s zsh 2>/dev/null)" || return 1
+  app="$(eval "$env_script" >/dev/null 2>&1; print -r -- "${GHTKN_APP:-}")"
+  [[ -n "$app" ]] || return 1
+  print -r -- "$app"
+}
+
+# agent の起動・unlock・期限切れ時の再認証までをまとめた入口
+# 引数省略時は ghtkn_app の App を使う
+function ghtkn_ready() {
+  local app=${1:-$(ghtkn_app)}
   if [[ -z "$app" ]]; then
-    print -u2 "ghtkn app is not set; export GHTKN_APP (e.g. in zsh/work/*.local.zsh)"
+    print -u2 "ghtkn app is not set; set GHTKN_APP (e.g. [env] in config.local.toml)"
     return 1
   fi
   ghtkn_agent_ensure || return
+  ghtkn_token_ensure "$app"
+}
 
-  if ! ghtkn_get_token "$app"; then
-    print -u2 "$app token is unavailable; run: ghtkn auth $app"
-    return 1
-  fi
+# 例: token="$(ghtkn_token "$GHTKN_APP")" || return
+# 残り期限は ghtkn_ready で確認済みなので、ここで -m を付けて二重に判定しない
+# （閾値ちょうどで切れると再認証せずに失敗するため）
+function ghtkn_token() {
+  local app=${1:-$(ghtkn_app)}
+  ghtkn_ready "$app" || return
+  ghtkn get "$app"
 }

@@ -16,3 +16,11 @@ export PATH="$HOME/.local/bin:$PATH"
 if [[ ( "$SHLVL" -eq 1 && ! -o LOGIN ) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprofile"
 fi
+
+# gh を ghtkn 経由にする関数は、非対話の zsh (coding agent の `zsh -c` 等) でも使えるよう
+# 全 zsh で読む。zshrc のローダは対話シェルで同じファイルを読み直すだけなので重複しても問題ない。
+# PATH では mise / Homebrew の gh が ~/.local/bin/gh より前に来るため、関数で拾う必要がある。
+for _ghtkn_fn in "$HOME/.zsh/functions/ghtkn.zsh" "$HOME/.zsh/functions/gh.zsh"; do
+  [[ -r "$_ghtkn_fn" ]] && source "$_ghtkn_fn"
+done
+unset _ghtkn_fn

@@ -1,11 +1,19 @@
 # set SSH_AUTH_SOCK
 _configure_ssh_agent() {
     # SSH ログイン先で agent 転送されている場合だけは既存のソケットを尊重する
-    # それ以外（macOS launchd / gcr-agent / herdr など OS やツールが勝手に設定したもの）は
+    # それ以外（macOS launchd / gcr-agent / herdr / 手動起動の ssh-agent など）は
     # 除外リストで個別対応せず、常に Keeper/Bitwarden を優先する。
-    # どの候補も存在しなければ既存の SSH_AUTH_SOCK をそのまま残す。
+    # どの候補も応答しなければ既存の SSH_AUTH_SOCK をそのまま残す。
+    #
+    # SSH_CONNECTION は -A なしのログインでも設定されるため、それだけでは転送と判断できない。
+    # sshd が作る転送ソケットのパスでも判定する（除外リストではなく「残すもの」を指定する）:
+    #   - OpenSSH 10.1 未満: /tmp/ssh-XXXXXXXXXX/agent.<pid>
+    #   - OpenSSH 10.1 以降: ~/.ssh/agent/s.<random>.sshd.<random>
+    #     (同じディレクトリの ssh-agent 自身のソケットは s.*.agent.* なので区別できる)
     if [ -n "${SSH_CONNECTION:-}" ] && [ -S "${SSH_AUTH_SOCK:-}" ]; then
-        return
+        case "$SSH_AUTH_SOCK" in
+            /tmp/ssh-*/agent.*|"$HOME"/.ssh/agent/s.*.sshd.*) return ;;
+        esac
     fi
 
     local _os _sock

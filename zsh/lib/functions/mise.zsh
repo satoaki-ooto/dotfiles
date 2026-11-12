@@ -15,7 +15,6 @@ function mise() {
     return
   fi
 
-  ghtkn_agent_ensure || return
   local token
   token="$(ghtkn_token "$GHTKN_APP")" || return
   local -x MISE_GITHUB_TOKEN="$token"

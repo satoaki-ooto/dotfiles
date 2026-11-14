@@ -1,4 +1,3 @@
 # pi
 [tools.pi]
-version = "1.5.0"
-minimum_release_age = "0d"
+version = "1.5.2"

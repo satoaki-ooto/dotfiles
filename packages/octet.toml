@@ -2,4 +2,3 @@
 [tools."github:skaft-software/octet"]
 version = "0.10.4"
 asset_pattern = 'octet-{{ version }}-{{ arch(x64="x86_64", arm64="aarch64") }}-{{ os(macos="apple-darwin", linux="unknown-linux-gnu") }}.tar.gz'
-minimum_release_age = "0d"

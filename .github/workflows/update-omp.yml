@@ -63,7 +63,9 @@ jobs:
           branch="bot/omp-$latest"
           # Any PR for this branch, including one closed by hand, means the
           # version was already proposed; do not reopen it.
-          if [[ -n $(gh pr list --head "$branch" --state all --json number --jq '.[].number') ]]; then
+          # Assign first: set -e does not fire for a failed substitution inside [[ ]].
+          prs=$(gh pr list --head "$branch" --state all --json number --jq '.[].number')
+          if [[ -n $prs ]]; then
             echo "a PR for $branch already exists"
             exit 0
           fi

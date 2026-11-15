@@ -1,0 +1,97 @@
+# Bump packages/omp.toml to the latest oh-my-pi release and open a PR.
+# omp follows the same-day policy (no minimum_release_age), so the latest
+# non-prerelease release is taken as soon as its binaries are uploaded.
+name: Update omp
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-omp
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UPSTREAM: can1357/oh-my-pi
+      PACKAGE_FILE: packages/omp.toml
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The PR targets main, so branch from main even when dispatched elsewhere.
+          ref: main
+
+      - name: Bump omp and open PR
+        run: |
+          set -euo pipefail
+
+          tag=$(gh api "repos/$UPSTREAM/releases/latest" --jq .tag_name)
+          latest=${tag#v}
+          # The tag comes from an external repo and ends up in sed, a branch
+          # name and the PR text, so accept only a plain semver.
+          if [[ ! $latest =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::unexpected upstream tag: $tag"
+            exit 1
+          fi
+
+          current=$(sed -n 's/^version = "\(.*\)"$/\1/p' "$PACKAGE_FILE")
+          newest=$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -n1)
+          if [[ $latest == "$current" || $newest != "$latest" ]]; then
+            echo "omp is up to date ($current)"
+            exit 0
+          fi
+
+          # Hosts resolve asset_pattern to omp-{darwin,linux}-{arm64,x64}.
+          # A release can be published before its binaries finish uploading;
+          # wait for the next run instead of shipping a version that fails to install.
+          assets=$(gh api "repos/$UPSTREAM/releases/tags/$tag" --jq '.assets[].name')
+          for asset in omp-darwin-arm64 omp-darwin-x64 omp-linux-arm64 omp-linux-x64; do
+            if ! grep -qx "$asset" <<<"$assets"; then
+              echo "$tag is missing $asset; retrying on the next run"
+              exit 0
+            fi
+          done
+
+          branch="bot/omp-$latest"
+          # Any PR for this branch, including one closed by hand, means the
+          # version was already proposed; do not reopen it.
+          # Assign first: set -e does not fire for a failed substitution inside [[ ]].
+          prs=$(gh pr list --head "$branch" --state all --json number --jq '.[].number')
+          if [[ -n $prs ]]; then
+            echo "a PR for $branch already exists"
+            exit 0
+          fi
+
+          # A previous run may have pushed the branch and then failed to open
+          # the PR; reuse that branch so the PR is retried.
+          if ! git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            sed -i "s/^version = \"$current\"$/version = \"$latest\"/" "$PACKAGE_FILE"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch -c "$branch"
+            git commit -am "Bump omp to $latest"
+            git push origin "$branch"
+          fi
+
+          gh pr create --base main --head "$branch" \
+            --title "Bump omp to $latest" \
+            --body "$(cat <<EOF
+          omp を最新版へ上げます。
+
+          - From: $current
+          - To: $latest
+          - Upstream release: https://github.com/$UPSTREAM/releases/tag/$tag
+
+          方針: omp は即日方針のため、公開日による絞り込みはせず最新版へ上げます。全体設定の minimum_release_age は omp には適用しません。$PACKAGE_FILE の version のみを変更しています。
+
+          この PR は .github/workflows/update-omp.yml が自動作成しました。
+          EOF
+          )"

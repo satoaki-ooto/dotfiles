@@ -38,3 +38,20 @@ gh api -X PUT repos/satoaki-ooto/dotfiles/rulesets/26912795 -f enforcement=activ
   GitHub App token だと 403 になるため、`GH_COMPANY=0 gh api ...` のように
   keyring 認証の gh を使う。認証方式は呼び出し側で指定する（コマンドに埋め込まない）。
   会社リポジトリで同様の操作をする場合は、その環境の認証に合わせる
+
+## omp の自動更新（GitHub Actions）
+
+`.github/workflows/update-omp.yml` が毎日 00:00 UTC（と `workflow_dispatch` での手動実行）に
+`can1357/oh-my-pi` の latest release を確認し、`packages/omp.toml` の `version` より新しければ
+`bot/omp-<version>` ブランチを作って PR を開く。マージは手動。
+
+- omp は即日方針なので公開日の待機はしない。ただし macOS / Linux の 4 バイナリ
+  （`omp-{darwin,linux}-{arm64,x64}`）が揃うまでは PR を作らず、次回の実行に回す
+- 同じ version の PR が既にあれば（手で閉じたものも含めて）何もしない。ブランチだけ残っている場合（前回 PR 作成に失敗した場合）はそのブランチで PR を作り直す。古い version の PR が残っていても自動では閉じない
+- `GITHUB_TOKEN` で PR を作るため、repo の Settings → Actions → General の
+  「Allow GitHub Actions to create and approve pull requests」を有効にしておく必要がある
+
+```sh
+GH_COMPANY=0 gh api -X PUT repos/satoaki-ooto/dotfiles/actions/permissions/workflow \
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
+```

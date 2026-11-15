@@ -26,7 +26,7 @@
 | [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
 | [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [octet.md](docs/octet.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
 | [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
-| [github.md](docs/github.md) | GitHub repo 設定（main の保護 ruleset と履歴改変時の解除手順） |
+| [github.md](docs/github.md) | GitHub repo 設定（main の保護 ruleset と履歴改変時の解除手順、omp の自動更新 workflow） |
 
 ## 新しい端末のセットアップ
 

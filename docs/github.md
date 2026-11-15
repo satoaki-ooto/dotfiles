@@ -47,7 +47,7 @@ gh api -X PUT repos/satoaki-ooto/dotfiles/rulesets/26912795 -f enforcement=activ
 
 - omp は即日方針なので公開日の待機はしない。ただし macOS / Linux の 4 バイナリ
   （`omp-{darwin,linux}-{arm64,x64}`）が揃うまでは PR を作らず、次回の実行に回す
-- 同じ version のブランチが既にあれば何もしない。古い version の PR が残っていても自動では閉じない
+- 同じ version の PR が既にあれば（手で閉じたものも含めて）何もしない。ブランチだけ残っている場合（前回 PR 作成に失敗した場合）はそのブランチで PR を作り直す。古い version の PR が残っていても自動では閉じない
 - `GITHUB_TOKEN` で PR を作るため、repo の Settings → Actions → General の
   「Allow GitHub Actions to create and approve pull requests」を有効にしておく必要がある
 

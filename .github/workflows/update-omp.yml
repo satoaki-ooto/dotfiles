@@ -25,6 +25,9 @@ jobs:
       PACKAGE_FILE: packages/omp.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The PR targets main, so branch from main even when dispatched elsewhere.
+          ref: main
 
       - name: Bump omp and open PR
         run: |
@@ -58,17 +61,23 @@ jobs:
           done
 
           branch="bot/omp-$latest"
-          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
-            echo "$branch already exists; PR is assumed to be open"
+          # Any PR for this branch, including one closed by hand, means the
+          # version was already proposed; do not reopen it.
+          if [[ -n $(gh pr list --head "$branch" --state all --json number --jq '.[].number') ]]; then
+            echo "a PR for $branch already exists"
             exit 0
           fi
 
-          sed -i "s/^version = \"$current\"$/version = \"$latest\"/" "$PACKAGE_FILE"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch"
-          git commit -am "Bump omp to $latest"
-          git push origin "$branch"
+          # A previous run may have pushed the branch and then failed to open
+          # the PR; reuse that branch so the PR is retried.
+          if ! git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            sed -i "s/^version = \"$current\"$/version = \"$latest\"/" "$PACKAGE_FILE"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch -c "$branch"
+            git commit -am "Bump omp to $latest"
+            git push origin "$branch"
+          fi
 
           gh pr create --base main --head "$branch" \
             --title "Bump omp to $latest" \

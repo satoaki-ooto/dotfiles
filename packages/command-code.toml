@@ -8,12 +8,13 @@
 # - aube では provenance 検証・typosquat ガードを通り、`aube ignored-builds` も空
 # - minimum_release_age = "0d" は mise 側の制限だけを外す。aube 自身の
 #   minimumReleaseAge（~/.config/aube/config.toml）は別に効くため、
-#   下の [env] で command-code だけ aube の期間制限から外している
+#   下の [dotfiles] で aube の設定に minimumReleaseAgeExclude を merge して外している
 # - mise は aube をプロセス内で動かすので、install_env は効かない。
-#   mise activate 済みシェルの環境変数として渡す必要がある（[env] はそれで効く）
+#   [env] も mise activate 済みシェルでしか効かず、bootstrap などでは効かないため、
+#   aube の設定ファイル側で除外する
 [tools."npm:command-code"]
 version = "latest"
 minimum_release_age = "0d"
 
-[env]
-AUBE_MINIMUM_RELEASE_AGE_EXCLUDE = "command-code"
+[dotfiles]
+"~/.config/aube/config.toml/command-code" = { source = "../agents/aube/command-code.toml", merge = true }

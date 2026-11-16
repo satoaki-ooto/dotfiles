@@ -1,0 +1,3 @@
+# command-code を aube の minimumReleaseAge から除外する。
+# packages/command-code.toml の [dotfiles] で ~/.config/aube/config.toml へ merge = true で配る
+minimumReleaseAgeExclude = ["command-code"]

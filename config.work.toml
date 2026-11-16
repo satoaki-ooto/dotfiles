@@ -19,7 +19,10 @@ paranoid = ["env_files", "plugins", "provenance"]
 minimum_release_age = "3d"
 disable_tools = ["python", "python3"]
 experimental = false
-npm.package_manager = "bun"
+# bun は provenance を検証できず、paranoid の provenance カテゴリと両立しない
+# （npm:* の install が「installs with bun, which cannot verify provenance」で失敗する）。
+# personal と同じく aube を使う
+npm.package_manager = "aube"
 
 [tools]
 # kubectl = "latest"

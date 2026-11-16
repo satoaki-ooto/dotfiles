@@ -1,4 +1,19 @@
 # command-code（npm:command-code）
+#
+# bin は cmd / cmdc / command-code / commandcode。
+#
+# npm backend は aube 前提（確認済み: 2026-11 / v1.88.5）:
+# - npm.package_manager = "bun" だと paranoid の provenance カテゴリと両立せず
+#   「installs with bun, which cannot verify provenance」で失敗する
+# - aube では provenance 検証・typosquat ガードを通り、`aube ignored-builds` も空
+# - minimum_release_age = "0d" は mise 側の制限だけを外す。aube 自身の
+#   minimumReleaseAge（~/.config/aube/config.toml）は別に効くため、
+#   下の [env] で command-code だけ aube の期間制限から外している
+# - mise は aube をプロセス内で動かすので、install_env は効かない。
+#   mise activate 済みシェルの環境変数として渡す必要がある（[env] はそれで効く）
 [tools."npm:command-code"]
 version = "latest"
 minimum_release_age = "0d"
+
+[env]
+AUBE_MINIMUM_RELEASE_AGE_EXCLUDE = "command-code"

@@ -1,6 +1,8 @@
 # agy（aqua:google-antigravity/antigravity-cli）
 [tools."aqua:google-antigravity/antigravity-cli"]
 version = "latest"
+# 他エージェント CLI と同じく age 制限を外す
+minimum_release_age = "0d"
 
 [env]
 # 自動更新の無効化。値は "true" 固定。"1" は効かない

@@ -63,6 +63,7 @@ AUBE_ALLOWED_UNPOPULAR_PACKAGES = "agent-hop"
 "~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
 "~/.config/mise/conf.d/go.toml"           = { source = "packages/go.toml", mode = "symlink" }
 "~/.config/mise/conf.d/grok.toml"         = { source = "packages/grok.toml", mode = "symlink" }
+"~/.config/mise/conf.d/jq.toml"           = { source = "packages/jq.toml", mode = "symlink" }
 "~/.config/mise/conf.d/kilo.toml"         = { source = "packages/kilo.toml", mode = "symlink" }
 "~/.config/mise/conf.d/leaf.toml"         = { source = "packages/leaf.toml", mode = "symlink" }
 "~/.config/mise/conf.d/node.toml"         = { source = "packages/node.toml", mode = "symlink" }

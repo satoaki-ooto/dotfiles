@@ -35,8 +35,9 @@ shell activation と共存させるため、symlink ではなく source する�
 - `~/.zshrc` → `zsh/zshrc`、`~/.zsh` → `zsh/lib`、`~/.zpreztorc` → `zsh/zpreztorc`、
   `~/.zshenv` → `zsh/zshenv` への symlink。編集はどちら側からでも同じ
 - [prezto](https://github.com/sorin-ionescu/prezto) は `~/.zprezto` に `[bootstrap.repos]` が clone する（submodules 込み）。更新は `mise bootstrap repos update`
-  update は submodule を同期しない（`submodules = true` は clone 時のみ有効）ので、`[bootstrap.hooks]` の post-repos で `git submodule update --init` を毎回走らせている。
-  これが無いと prezto が submodule ポインタを上げたとき `~/.zprezto` が dirty になり bootstrap が止まる
+  `submodules = true` は clone 時のみ有効で、`mise bootstrap repos update` は `[bootstrap.hooks]` を実行しない。
+  そのため `post-repos` で `~/.zprezto` に `submodule.recurse = true` を設定して `repos update`（内部の `git pull --ff-only`）が submodule にも追従するようにし、`pre-repos` でも `git submodule update --init` を走らせて既存の submodule ズレ（dirty 状態）から `mise bootstrap` で自動復旧できるようにしている。
+  既存端末での初回有効化や、prezto 側で新規 submodule が追加されたときの初期化は `mise bootstrap`（または `mise bootstrap --only repos`）で行う
 - ローダは `~/.zsh`、続いて `~/.zsh.*`（役割別）を `**/*.zsh` → `**/*.sh` の順で再帰 source。
   役割側が後なので、共通の alias 等を役割別断片で上書きできる
 - 役割別断片は `zsh/personal/` / `zsh/work/`。config.personal.toml / config.work.toml が

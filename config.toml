@@ -20,10 +20,13 @@
 "~/.zprezto" = { url = "https://github.com/sorin-ionescu/prezto.git", submodules = true, depth = 1 }
 
 [bootstrap.hooks]
-# repos の update / apply は fast-forward / checkout のみで submodule を同期しない
-# （submodules = true は clone 時にしか効かない）。prezto が submodule ポインタを
-# 上げると ~/.zprezto が dirty になり次の bootstrap が止まるため、毎回同期する。
-post-repos = "git -C ~/.zprezto submodule update --init"
+# `mise bootstrap repos update` は `[bootstrap.hooks]` を実行せず、内部の
+# `git pull --ff-only` も既定では submodule を同期しない（`submodules = true` は
+# clone 時のみ有効）。post-repos で `submodule.recurse = true` を設定しておけば
+# 以降の `repos update` が submodule も追従する。すでに submodule ズレで dirty な
+# 端末を `mise bootstrap` で自動復旧できるよう、pre-repos でも同期する。
+pre-repos = "if [ -e ~/.zprezto/.git ]; then git -C ~/.zprezto submodule update --init; fi"
+post-repos = "git -C ~/.zprezto config submodule.recurse true && git -C ~/.zprezto submodule update --init"
 
 # ---------------------------------------------------------------
 # dotfiles の deploy

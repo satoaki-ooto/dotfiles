@@ -15,7 +15,7 @@
 
 ## 新しい端末のセットアップ
 
-`tmux` をインストールしたうえで、[TPM](https://github.com/tmux-plugins/tpm) を clone してプラグインを入れる。
+`tmux`（3.5 以上推奨。`extended-keys-format csi-u` は 3.5 以上でのみ有効になる）をインストールしたうえで、[TPM](https://github.com/tmux-plugins/tpm) を clone してプラグインを入れる。
 
 ```sh
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -27,10 +27,12 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 ## 既存の `~/.tmux.conf` からの移行
 
-別リポジトリへの symlink など既存の `~/.tmux.conf` がある端末では、`mise bootstrap --update` は上書きせず競合で止まる。内容を確認してから置き換える。
+既存の `~/.tmux.conf`（通常ファイルや別リポジトリへの symlink）がある端末では、`mise bootstrap --update` は上書きせず競合で止まる。
+内容を確認し、必要なら退避してから `~/.tmux.conf` だけ適用する（`mise bootstrap --force-dotfiles` は他の競合ファイルも一括で上書きするため使わない）。
 
 ```sh
 mise dot status
 mise dot diff
-mise bootstrap --force-dotfiles
+mv -i ~/.tmux.conf ~/.tmux.conf.bak   # 既存のバックアップと重複しない名前にする
+mise dot apply '~/.tmux.conf'
 ```

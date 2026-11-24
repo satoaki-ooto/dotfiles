@@ -19,6 +19,12 @@
 # prezto 本体。更新は `mise bootstrap repos update`
 "~/.zprezto" = { url = "https://github.com/sorin-ionescu/prezto.git", submodules = true, depth = 1 }
 
+[bootstrap.hooks]
+# repos の update / apply は fast-forward / checkout のみで submodule を同期しない
+# （submodules = true は clone 時にしか効かない）。prezto が submodule ポインタを
+# 上げると ~/.zprezto が dirty になり次の bootstrap が止まるため、毎回同期する。
+post-repos = "git -C ~/.zprezto submodule update --init"
+
 # ---------------------------------------------------------------
 # dotfiles の deploy
 # 相対 source は config.toml のある場所（= repo ルート）基準

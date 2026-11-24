@@ -56,6 +56,14 @@ post-repos = "git -C ~/.zprezto submodule update --init"
 "~/.tmux.conf" = { source = "tmux/tmux.conf", mode = "symlink" }
 
 # ---------------------------------------------------------------
+# herdr
+# 実体: herdr/config.toml。symlink で配備するため、編集はどちら側からでも同じ。
+# プラグイン本体（~/.config/herdr/plugins/）やランタイムファイル（session.json /
+# ログ / ソケット類）は各端末ローカル管理のためリポジトリ対象外（docs/herdr.md 参照）。
+# ---------------------------------------------------------------
+"~/.config/herdr/config.toml" = { source = "herdr/config.toml", mode = "symlink" }
+
+# ---------------------------------------------------------------
 # コーディングエージェント
 # 実体: agents/<agent>/。共通の指示（AGENTS.md / rules/）は agents/shared/ に置き、
 # 各エージェントから参照する（AGENTS.md は「全エージェントで共通」という位置づけ）

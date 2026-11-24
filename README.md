@@ -24,6 +24,7 @@
 | [config.md](docs/config.md) | リポジトリの構成（各ファイルの役割） |
 | [zsh.md](docs/zsh.md) | zsh / prezto の管理分担・編集・設定 |
 | [tmux.md](docs/tmux.md) | tmux の設定・プラグイン（TPM）の扱い |
+| [herdr.md](docs/herdr.md) | herdr の設定・プラグイン（herdr-worktrunk）の扱い |
 | [agents.md](docs/agents.md) | コーディングエージェント設定の共通方式 |
 | [pi.md](docs/pi.md) / [pig.md](docs/pig.md) / [omp.md](docs/omp.md) / [octet.md](docs/octet.md) / [kilo.md](docs/kilo.md) / [ags.md](docs/ags.md) | 各エージェントの設定 |
 | [secrets.md](docs/secrets.md) | 秘密情報（sops + age）の扱い |
@@ -155,7 +156,7 @@ mise bootstrap
 
 ### repo 内の source を編集した場合
 
-`config.toml`、`config.personal.toml`、`agents/`、`zsh/`、`tmux/` などを編集する通常のケース。
+`config.toml`、`config.personal.toml`、`agents/`、`zsh/`、`tmux/`、`herdr/` などを編集する通常のケース。
 
 ```sh
 # dotfiles の変更を端末へ配備

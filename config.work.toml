@@ -82,9 +82,11 @@ npm.package_manager = "aube"
 "~/.config/mise/conf.d/agent-hop.toml"    = { mode = "absent" }
 "~/.config/mise/conf.d/agy.toml"          = { mode = "absent" }
 "~/.config/mise/conf.d/cf.toml"           = { mode = "absent" }
-"~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/pnpm.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/strix.toml"        = { mode = "absent" }
 "~/.config/mise/conf.d/zig.toml"          = { mode = "absent" }
 "~/.config/mise/conf.d/zls.toml"          = { mode = "absent" }
 "~/.config/mise/conf.d/zro.toml"          = { mode = "absent" }
+
+# どちらの役割でも使わないパッケージ（packages/ に定義だけ残し、配備済みの symlink を消す）
+"~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }

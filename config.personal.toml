@@ -62,7 +62,6 @@ AUBE_ALLOWED_UNPOPULAR_PACKAGES = "agent-hop"
 "~/.config/mise/conf.d/command-code.toml" = { source = "packages/command-code.toml", mode = "symlink" }
 "~/.config/mise/conf.d/gh.toml"           = { source = "packages/gh.toml", mode = "symlink" }
 "~/.config/mise/conf.d/go.toml"           = { source = "packages/go.toml", mode = "symlink" }
-"~/.config/mise/conf.d/grok.toml"         = { source = "packages/grok.toml", mode = "symlink" }
 "~/.config/mise/conf.d/jq.toml"           = { source = "packages/jq.toml", mode = "symlink" }
 "~/.config/mise/conf.d/kilo.toml"         = { source = "packages/kilo.toml", mode = "symlink" }
 "~/.config/mise/conf.d/leaf.toml"         = { source = "packages/leaf.toml", mode = "symlink" }
@@ -83,3 +82,6 @@ AUBE_ALLOWED_UNPOPULAR_PACKAGES = "agent-hop"
 "~/.config/mise/conf.d/microsandbox.toml" = { mode = "absent" }
 "~/.config/mise/conf.d/nono.toml"         = { mode = "absent" }
 "~/.config/mise/conf.d/rust.toml"         = { mode = "absent" }
+
+# どちらの役割でも使わないパッケージ（packages/ に定義だけ残し、配備済みの symlink を消す）
+"~/.config/mise/conf.d/grok.toml"         = { mode = "absent" }

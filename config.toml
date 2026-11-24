@@ -49,6 +49,13 @@ post-repos = "git -C ~/.zprezto submodule update --init"
 "~/.zprofile/prezto" = { block = '[[ -s "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile" ]] && source "${ZDOTDIR:-$HOME}/.zprezto/runcoms/zprofile"' }
 
 # ---------------------------------------------------------------
+# tmux
+# 実体: tmux/tmux.conf。symlink で配備するため、編集はどちら側からでも同じ。
+# プラグイン本体（~/.tmux/plugins/）は TPM 管理のためリポジトリ対象外（docs/tmux.md 参照）。
+# ---------------------------------------------------------------
+"~/.tmux.conf" = { source = "tmux/tmux.conf", mode = "symlink" }
+
+# ---------------------------------------------------------------
 # コーディングエージェント
 # 実体: agents/<agent>/。共通の指示（AGENTS.md / rules/）は agents/shared/ に置き、
 # 各エージェントから参照する（AGENTS.md は「全エージェントで共通」という位置づけ）

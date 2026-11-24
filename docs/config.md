@@ -19,7 +19,7 @@
 - `zsh/lib/` は `~/.zsh` の実体。全端末共通の断片
 - `zsh/personal/` / `zsh/work/` は役割別の断片。`~/.zsh.personal` / `~/.zsh.work` として deploy
 - `tmux/tmux.conf` は `~/.tmux.conf` の実体（symlink で deploy）
-- `herdr/config.toml` は `~/.config/herdr/config.toml` の実体（symlink で deploy）
+- `herdr/config.toml` / `herdr/plugins/worktrunk/config.toml` は `~/.config/herdr/config.toml` / `~/.config/herdr/plugins/config/worktrunk/config.toml` の実体（symlink で deploy）。`herdr-worktrunk` プラグイン本体は `config.toml` の `[tasks.bootstrap]` で自動導入・有効化
 - `agents/shared/` は全エージェント共通の指示（`AGENTS.md` / `rules/`）
 - `agents/<agent>/` はエージェント固有の設定。対応する設定ディレクトリへ deploy
 

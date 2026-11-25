@@ -59,6 +59,17 @@ post-repos = "git -C ~/.zprezto config submodule.recurse true && git -C ~/.zprez
 "~/.tmux.conf" = { source = "tmux/tmux.conf", mode = "symlink" }
 
 # ---------------------------------------------------------------
+# herdr
+# 実体: herdr/config.toml、herdr/plugins/worktrunk/config.toml。
+# symlink で配備するため、編集はどちら側からでも同じ。
+# プラグイン本体（~/.config/herdr/plugins/github/）は [tasks.bootstrap] で導入し、
+# ランタイムファイル（plugins.json / session.json / ログ / ソケット類）は
+# 各端末ローカル管理のためリポジトリ対象外（docs/herdr.md 参照）。
+# ---------------------------------------------------------------
+"~/.config/herdr/config.toml"                          = { source = "herdr/config.toml", mode = "symlink" }
+"~/.config/herdr/plugins/config/worktrunk/config.toml" = { source = "herdr/plugins/worktrunk/config.toml", mode = "symlink" }
+
+# ---------------------------------------------------------------
 # コーディングエージェント
 # 実体: agents/<agent>/。共通の指示（AGENTS.md / rules/）は agents/shared/ に置き、
 # 各エージェントから参照する（AGENTS.md は「全エージェントで共通」という位置づけ）
@@ -109,5 +120,19 @@ login_shell = "zsh"
 # ---------------------------------------------------------------
 # ファイルだけでは表現できないセットアップ（冪等に。毎回走る）
 # ---------------------------------------------------------------
-# [tasks.bootstrap]
-# run = "install -d -m 700 ~/.ssh"
+[tasks.bootstrap]
+description = "herdr が導入済みの端末で worktrunk プラグインを導入・有効化する"
+run = """
+set -eu
+command -v herdr >/dev/null 2>&1 || exit 0
+plugins_json=$(herdr plugin list --plugin worktrunk --json)
+if ! printf '%s\n' "$plugins_json" | grep -Eq '"plugin_id"[[:space:]]*:[[:space:]]*"worktrunk"'; then
+  herdr plugin install devashish2203/herdr-worktrunk --yes
+elif ! printf '%s\n' "$plugins_json" | grep -Eq '"enabled"[[:space:]]*:[[:space:]]*true'; then
+  if (herdr status server 2>/dev/null || true) | grep -Fxq 'status: running'; then
+    herdr plugin enable worktrunk >/dev/null
+  else
+    echo "herdr: worktrunk plugin is installed but disabled (start herdr and run 'herdr plugin enable worktrunk')" >&2
+  fi
+fi
+"""
